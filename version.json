@@ -1,0 +1,10 @@
+{
+  "versao": "1.4.0",
+  "data": "15/08/2026",
+  "obrigatoria": false,
+  "novidades": [
+    "Novo Módulo de Emissão de Orçamentos em PDF",
+    "Melhorias na busca de clientes",
+    "Ajustes no tema Laranja e Cinza"
+  ]
+}
