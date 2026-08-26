@@ -8,7 +8,7 @@ export function carregarMenuLateral() {
         { nome: 'Dashboard / Home', url: 'index.html', icone: 'layout-dashboard' },
         { nome: 'Clientes', url: 'clientes.html', icone: 'users' },
         { nome: 'Catálogo de Serviços', url: 'servicos.html', icone: 'wrench' },
-        { nome: 'Ordens de Serviço / OS', url: 'ordemdeservico.html', icone: 'file-text' },
+        { nome: 'Ordens de Serviço / OS', url: 'ordemdeServico.html', icone: 'file-text' },
         { nome: 'Gestão de Despesas', url: 'despesas.html', icone: 'receipt' },
         { nome: 'Financeiro', url: 'financeiro.html', icone: 'dollar-sign' },
         { nome: 'Relatórios & DRE', url: 'relatorios.html', icone: 'pie-chart' },
