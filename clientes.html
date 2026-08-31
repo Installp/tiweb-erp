@@ -17,8 +17,14 @@
 </head>
 <body class="bg-darkbg text-gray-200 min-h-screen font-sans flex flex-col">
 
+    <!-- 0. TELA DE CARREGAMENTO -->
+    <div id="screen-loading" class="flex-1 flex flex-col items-center justify-center min-h-screen z-50 bg-darkbg">
+        <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500 mb-4"></div>
+        <p class="text-sm text-gray-400">Verificando acesso...</p>
+    </div>
+
     <!-- PAINEL PRINCIPAL -->
-    <div id="app-dashboard" class="flex-1 flex flex-col md:flex-row min-h-screen">
+    <div id="app-dashboard" class="hidden flex-1 flex flex-col md:flex-row min-h-screen">
         
        
 <!-- MENU LATERAL INDEPENDENTE INJETADO AQUI    -->
@@ -116,28 +122,34 @@
 
     <!-- SCRIPT DA PÁGINA -->
 <script type="module">
-    // Cole estas duas linhas logo no começo do seu script!
     import { carregarMenuLateral } from './menu.js';
+    import { auth } from './firebase-config.js';
+    import { signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+
     carregarMenuLateral();
 
-    // Importações do Firebase que já estão aí...
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    // ... restante do seu código ...
+    // CHECAR AUTENTICAÇÃO ANTES DE EXIBIR A PÁGINA
+    // (mesma lógica usada nos outros módulos do sistema)
+    onAuthStateChanged(auth, (user) => {
+        const loadingScreen = document.getElementById('screen-loading');
+        if (loadingScreen) loadingScreen.classList.add('hidden');
 
-    // SUBSTITUA a sua função window.logout antiga por este ouvinte de clique:
+        if (user) {
+            document.getElementById('app-dashboard').classList.remove('hidden');
+            window.dispatchEvent(new Event('usuario-autenticado'));
+        } else {
+            window.location.href = 'index.html';
+        }
+    });
+
     document.body.addEventListener('click', (e) => {
         const btnOut = e.target.closest('#btn-logout-global');
         if (btnOut) {
             signOut(auth).then(() => { window.location.href = 'index.html'; });
         }
     });
-
-    
 </script>
 
-
-
-
-    <script type="module" src="clientes.js">   </script>
+    <script type="module" src="clientes.js"></script>
 </body>
 </html>

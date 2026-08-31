@@ -259,22 +259,10 @@
         });
 
         // 3. LÓGICA DO MÓDULO E FIREBASE
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getAuth, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-        import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, updateDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-
-        const firebaseConfig = {
-            apiKey: "AIzaSyBHMJCMzX-5so4gAD8aXv0SOpps-2xxeLE",
-            authDomain: "erp-ti-2c92d.firebaseapp.com",
-            projectId: "erp-ti-2c92d",
-            storageBucket: "erp-ti-2c92d.firebasestorage.app",
-            messagingSenderId: "1075643576721",
-            appId: "1:1075643576721:web:5a9da33c743494275eea30"
-        };
-
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
+        import { auth, db } from './firebase-config.js';
+        import { signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { collection, addDoc, getDocs, deleteDoc, doc, updateDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { escapeHTML, formatarMoeda, mostrarToast, arredondaMoeda } from './utils.js';
 
         let cacheClientes = [];
         let cacheServicos = [];
@@ -283,11 +271,6 @@
         let tempServicos = [];
         let tempPecas = [];
         let clienteSelecionado = null;
-
-        // Utilitário para formatar Moeda (BRL)
-        const formatarMoeda = (valor) => {
-            return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(valor || 0);
-        };
 
         // CHECAR AUTENTICAÇÃO
         onAuthStateChanged(auth, async (user) => {
@@ -299,7 +282,7 @@
                 await carregarListasBase();
                 await carregarOrcamentos();
             } else {
-                window.location.href = 'Index.html';
+                window.location.href = 'index.html';
             }
         });
 
@@ -348,7 +331,7 @@
                 const selS = document.getElementById('o-servico');
                 if (selS) {
                     selS.innerHTML = cacheServicos.length > 0 
-                        ? cacheServicos.map(s => `<option value="${s.id}">${s.nome} (${formatarMoeda(s.valor)})</option>`).join('')
+                        ? cacheServicos.map(s => `<option value="${escapeHTML(s.id)}">${escapeHTML(s.nome)} (${formatarMoeda(s.valor)})</option>`).join('')
                         : '<option value="">Nenhum serviço cadastrado no catálogo</option>';
                 }
             } catch (err) {
@@ -391,16 +374,16 @@
                     }
 
                     html += `<tr class="border-b border-cardborder hover:bg-darkbg/50 transition-colors">
-                        <td class="p-3 font-mono text-blue-400 font-bold">${item.numeroOS || '-'}</td>
-                        <td class="p-3 font-semibold text-white">${item.clienteNome || '-'}</td>
-                        <td class="p-3 text-xs text-gray-300">${item.equipamento || '-'}</td>
-                        <td class="p-3 text-xs font-mono">${item.data || '-'}</td>
+                        <td class="p-3 font-mono text-blue-400 font-bold">${escapeHTML(item.numeroOS) || '-'}</td>
+                        <td class="p-3 font-semibold text-white">${escapeHTML(item.clienteNome) || '-'}</td>
+                        <td class="p-3 text-xs text-gray-300">${escapeHTML(item.equipamento) || '-'}</td>
+                        <td class="p-3 text-xs font-mono">${escapeHTML(item.data) || '-'}</td>
                         <td class="p-3 font-semibold text-emerald-400">${formatarMoeda(item.total)}</td>
                         <td class="p-3">${statusBadge}</td>
                         <td class="p-3 flex justify-center gap-2">
-                            <button type="button" onclick="editarOrcamento('${item.id}')" class="px-2.5 py-1.5 bg-yellow-500/20 text-yellow-400 rounded hover:bg-yellow-500/30 text-xs font-semibold transition-colors">✏️ Editar</button>
-                            <button type="button" onclick="imprimirOrcamento('${item.id}')" class="px-2.5 py-1.5 bg-blue-500/20 text-blue-400 rounded hover:bg-blue-500/30 text-xs font-semibold transition-colors">📄 Imprimir</button>
-                            <button type="button" onclick="deletarOrcamento('${item.id}')" class="px-2.5 py-1.5 bg-red-500/20 text-red-400 rounded hover:bg-red-500/30 text-xs font-semibold transition-colors">🗑️ Excluir</button>
+                            <button type="button" onclick="editarOrcamento('${escapeHTML(item.id)}')" class="px-2.5 py-1.5 bg-yellow-500/20 text-yellow-400 rounded hover:bg-yellow-500/30 text-xs font-semibold transition-colors">✏️ Editar</button>
+                            <button type="button" onclick="imprimirOrcamento('${escapeHTML(item.id)}')" class="px-2.5 py-1.5 bg-blue-500/20 text-blue-400 rounded hover:bg-blue-500/30 text-xs font-semibold transition-colors">📄 Imprimir</button>
+                            <button type="button" onclick="deletarOrcamento('${escapeHTML(item.id)}')" class="px-2.5 py-1.5 bg-red-500/20 text-red-400 rounded hover:bg-red-500/30 text-xs font-semibold transition-colors">🗑️ Excluir</button>
                         </td>
                     </tr>`;
                 });
@@ -459,9 +442,9 @@
             if (filtrados.length > 0) {
                 let html = '';
                 filtrados.forEach(c => {
-                    html += `<div onclick="selecionarClienteDirect('${c.id}')" class="p-2.5 border-b border-cardborder hover:bg-blue-600/20 cursor-pointer text-sm transition-colors">
-                        <span class="font-bold text-white">${c.nome}</span> 
-                        <span class="text-xs text-gray-400">${c.docNum ? '('+c.docNum+')' : ''}</span>
+                    html += `<div onclick="selecionarClienteDirect('${escapeHTML(c.id)}')" class="p-2.5 border-b border-cardborder hover:bg-blue-600/20 cursor-pointer text-sm transition-colors">
+                        <span class="font-bold text-white">${escapeHTML(c.nome)}</span> 
+                        <span class="text-xs text-gray-400">${c.docNum ? '('+escapeHTML(c.docNum)+')' : ''}</span>
                     </div>`;
                 });
                 resDiv.innerHTML = html;
@@ -490,7 +473,7 @@
             const serv = cacheServicos.find(s => s.id === selId);
             if (serv) {
                 const unit = Number(serv.valor) || 0;
-                tempServicos.push({ nome: serv.nome, qtd: qtd, valorUnit: unit, subtotal: unit * qtd });
+                tempServicos.push({ nome: serv.nome, qtd: qtd, valorUnit: unit, subtotal: arredondaMoeda(unit * qtd) });
                 document.getElementById('o-servico-qtd').value = '1';
                 renderItensOrcamento();
             }
@@ -502,7 +485,7 @@
             const unit = parseFloat(document.getElementById('o-peca-valor').value) || 0;
 
             if (nome) {
-                tempPecas.push({ nome, qtd: qtd, valorUnit: unit, subtotal: unit * qtd });
+                tempPecas.push({ nome, qtd: qtd, valorUnit: unit, subtotal: arredondaMoeda(unit * qtd) });
                 document.getElementById('o-peca-nome').value = '';
                 document.getElementById('o-peca-valor').value = '';
                 document.getElementById('o-peca-qtd').value = '1';
@@ -516,7 +499,7 @@
         function renderItensOrcamento() {
             document.getElementById('o-servicos-lista').innerHTML = tempServicos.map((s, idx) => `
                 <div class="flex justify-between items-center bg-cardbg p-2 rounded border border-cardborder">
-                    <span class="text-white text-xs">${s.qtd}x ${s.nome}</span>
+                    <span class="text-white text-xs">${s.qtd}x ${escapeHTML(s.nome)}</span>
                     <div class="flex items-center gap-3">
                         <span class="text-emerald-400 font-bold text-xs">${formatarMoeda(s.subtotal)} <span class="text-gray-500 font-normal">(${s.qtd}x ${formatarMoeda(s.valorUnit)})</span></span>
                         <button type="button" onclick="removerServicoTemp(${idx})" class="text-red-400 hover:text-red-300 font-bold text-sm bg-red-500/10 hover:bg-red-500/20 w-6 h-6 rounded flex items-center justify-center transition-colors">✕</button>
@@ -525,7 +508,7 @@
 
             document.getElementById('o-pecas-lista').innerHTML = tempPecas.map((p, idx) => `
                 <div class="flex justify-between items-center bg-cardbg p-2 rounded border border-cardborder">
-                    <span class="text-white text-xs">${p.qtd}x ${p.nome}</span>
+                    <span class="text-white text-xs">${p.qtd}x ${escapeHTML(p.nome)}</span>
                     <div class="flex items-center gap-3">
                         <span class="text-emerald-400 font-bold text-xs">${formatarMoeda(p.subtotal)} <span class="text-gray-500 font-normal">(${p.qtd}x ${formatarMoeda(p.valorUnit)})</span></span>
                         <button type="button" onclick="removerPecaTemp(${idx})" class="text-red-400 hover:text-red-300 font-bold text-sm bg-red-500/10 hover:bg-red-500/20 w-6 h-6 rounded flex items-center justify-center transition-colors">✕</button>
@@ -537,10 +520,10 @@
 
         window.calcularTotalOrcamento = function() {
             const km = parseFloat(document.getElementById('o-km').value) || 0;
-            const custoKM = km * 2.50;
-            const totalS = tempServicos.reduce((a, b) => a + (Number(b.subtotal) || Number(b.valor) || 0), 0);
-            const totalP = tempPecas.reduce((a, b) => a + (Number(b.subtotal) || Number(b.valor) || 0), 0);
-            const total = totalS + totalP + custoKM;
+            const custoKM = arredondaMoeda(km * 2.50);
+            const totalS = tempServicos.reduce((a, b) => arredondaMoeda(a + (Number(b.subtotal) || Number(b.valor) || 0)), 0);
+            const totalP = tempPecas.reduce((a, b) => arredondaMoeda(a + (Number(b.subtotal) || Number(b.valor) || 0)), 0);
+            const total = arredondaMoeda(totalS + totalP + custoKM);
 
             document.getElementById('o-total-txt').innerText = formatarMoeda(total);
             return total;
@@ -549,7 +532,7 @@
         // SALVAR ORDEM DE SERVIÇO
         window.salvarOrcamento = async function() {
             if (!clienteSelecionado) {
-                alert("Por favor, localize e selecione um cliente da lista!");
+                mostrarToast("Por favor, localize e selecione um cliente da lista!", 'erro');
                 document.getElementById('o-cliente-search').focus();
                 return;
             }
@@ -581,7 +564,7 @@
                 servicos: tempServicos,
                 pecas: tempPecas,
                 km: km,
-                custoDeslocamento: km * 2.50,
+                custoDeslocamento: arredondaMoeda(km * 2.50),
                 total: total,
                 data: editId ? (cacheOrcamentos.find(o => o.id === editId)?.data || new Date().toLocaleDateString('pt-BR')) : new Date().toLocaleDateString('pt-BR')
             };
@@ -594,9 +577,10 @@
                 }
                 closeModal('modal-orcamento');
                 await carregarOrcamentos();
+                mostrarToast('Ordem de Serviço salva com sucesso.', 'sucesso');
             } catch (err) {
                 console.error("Erro ao salvar ordem de serviço:", err);
-                alert("Erro ao salvar ordem de serviço. Verifique sua conexão.");
+                mostrarToast("Erro ao salvar ordem de serviço. Verifique sua conexão.", 'erro');
             } finally {
                 btnSalvar.disabled = false;
                 btnSalvar.innerText = "Salvar Ordem de Serviço";
@@ -634,9 +618,10 @@
                 try {
                     await deleteDoc(doc(db, "orcamentos", id));
                     await carregarOrcamentos();
+                    mostrarToast('Ordem de Serviço excluída.', 'sucesso');
                 } catch (err) {
                     console.error("Erro ao excluir OS:", err);
-                    alert("Erro ao excluir Ordem de Serviço. Verifique suas permissões.");
+                    mostrarToast("Erro ao excluir Ordem de Serviço. Verifique suas permissões.", 'erro');
                 }
             }
         }
@@ -682,7 +667,7 @@
             if (item.servicos && item.servicos.length > 0) {
                 item.servicos.forEach(s => {
                     htmlItens += `<tr style="border-bottom: 1px solid #ddd;">
-                        <td style="padding: 8px;">Serviço: ${s.nome}</td>
+                        <td style="padding: 8px;">Serviço: ${escapeHTML(s.nome)}</td>
                         <td style="padding: 8px; text-align: center;">${s.qtd || 1}</td>
                         <td style="padding: 8px; text-align: right;">${formatarMoeda(s.valorUnit)}</td>
                         <td style="padding: 8px; text-align: right;">${formatarMoeda(s.subtotal)}</td>
@@ -693,7 +678,7 @@
             if (item.pecas && item.pecas.length > 0) {
                 item.pecas.forEach(p => {
                     htmlItens += `<tr style="border-bottom: 1px solid #ddd;">
-                        <td style="padding: 8px;">Peça/Insumo: ${p.nome}</td>
+                        <td style="padding: 8px;">Peça/Insumo: ${escapeHTML(p.nome)}</td>
                         <td style="padding: 8px; text-align: center;">${p.qtd || 1}</td>
                         <td style="padding: 8px; text-align: right;">${formatarMoeda(p.valorUnit)}</td>
                         <td style="padding: 8px; text-align: right;">${formatarMoeda(p.subtotal)}</td>
@@ -715,25 +700,25 @@
                 <div style="font-family: Arial, sans-serif; color: #000; max-width: 800px; margin: 0 auto; padding: 20px; background: #fff;">
                     <div style="display: flex; justify-content: space-between; border-bottom: 2px solid #333; padding-bottom: 15px; margin-bottom: 15px;">
                         <div>
-                            <h1 style="font-size: 20px; font-weight: bold; margin: 0;">${empresaNome}</h1>
+                            <h1 style="font-size: 20px; font-weight: bold; margin: 0;">${escapeHTML(empresaNome)}</h1>
                             <p style="font-size: 12px; margin: 2px 0;">Suporte Técnico & Soluções de TI</p>
-                            ${empresaDoc ? `<p style="font-size: 11px; margin: 2px 0;">CNPJ/CPF: ${empresaDoc}</p>` : ''}
-                            ${empresaTel ? `<p style="font-size: 11px; margin: 2px 0;">Tel: ${empresaTel}</p>` : ''}
-                            ${empresaEmail ? `<p style="font-size: 11px; margin: 2px 0;">${empresaEmail}</p>` : ''}
-                            ${empresaEnd ? `<p style="font-size: 11px; margin: 2px 0;">${empresaEnd}</p>` : ''}
+                            ${empresaDoc ? `<p style="font-size: 11px; margin: 2px 0;">CNPJ/CPF: ${escapeHTML(empresaDoc)}</p>` : ''}
+                            ${empresaTel ? `<p style="font-size: 11px; margin: 2px 0;">Tel: ${escapeHTML(empresaTel)}</p>` : ''}
+                            ${empresaEmail ? `<p style="font-size: 11px; margin: 2px 0;">${escapeHTML(empresaEmail)}</p>` : ''}
+                            ${empresaEnd ? `<p style="font-size: 11px; margin: 2px 0;">${escapeHTML(empresaEnd)}</p>` : ''}
                         </div>
                         <div style="text-align: right;">
                             <h2 style="font-size: 16px; font-weight: bold; margin: 0;">ORDEM DE SERVIÇO</h2>
-                            <p style="font-size: 14px; font-weight: bold; color: #2563eb; margin: 2px 0;">N°: ${item.numeroOS || '-'}</p>
-                            <p style="font-size: 11px; margin: 2px 0;">Data: ${item.data || '-'}</p>
-                            <p style="font-size: 11px; font-weight: bold; margin: 2px 0;">Status: ${item.status || '-'}</p>
+                            <p style="font-size: 14px; font-weight: bold; color: #2563eb; margin: 2px 0;">N°: ${escapeHTML(item.numeroOS) || '-'}</p>
+                            <p style="font-size: 11px; margin: 2px 0;">Data: ${escapeHTML(item.data) || '-'}</p>
+                            <p style="font-size: 11px; font-weight: bold; margin: 2px 0;">Status: ${escapeHTML(item.status) || '-'}</p>
                         </div>
                     </div>
                     
                     <div style="margin-bottom: 15px; font-size: 13px; background: #f9f9f9; padding: 10px; border-radius: 4px; border: 1px solid #ddd;">
-                        <p style="margin: 4px 0;"><strong>Cliente:</strong> ${item.clienteNome || '-'}</p>
-                        <p style="margin: 4px 0;"><strong>Contato / Tel:</strong> ${item.clienteFone || '-'}${item.clienteDoc ? ' | <strong>Doc:</strong> ' + item.clienteDoc : ''}</p>
-                        <p style="margin: 4px 0;"><strong>Equipamento / Defeito:</strong> ${item.equipamento || 'Nenhum equipamento informado'}</p>
+                        <p style="margin: 4px 0;"><strong>Cliente:</strong> ${escapeHTML(item.clienteNome) || '-'}</p>
+                        <p style="margin: 4px 0;"><strong>Contato / Tel:</strong> ${escapeHTML(item.clienteFone) || '-'}${item.clienteDoc ? ' | <strong>Doc:</strong> ' + escapeHTML(item.clienteDoc) : ''}</p>
+                        <p style="margin: 4px 0;"><strong>Equipamento / Defeito:</strong> ${escapeHTML(item.equipamento) || 'Nenhum equipamento informado'}</p>
                     </div>
 
                     <table style="width: 100%; border-collapse: collapse; font-size: 12px; margin-bottom: 15px;">

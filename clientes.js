@@ -2,6 +2,7 @@
 import { auth, db } from './firebase-config.js';
 import { signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 import { collection, addDoc, getDocs, deleteDoc, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import { escapeHTML, mostrarToast } from './utils.js';
 
 let cacheClientes = [];
 
@@ -21,8 +22,12 @@ const fDoc = document.getElementById('c-doc');
 const fEndereco = document.getElementById('c-endereco');
 
 // 1. INICIALIZAÇÃO E EVENT LISTENERS
-document.addEventListener('DOMContentLoaded', () => {
+// Só carrega dados do Firestore DEPOIS que a autenticação for confirmada
+// pelo gate em clientes.html (evita chamada ao banco antes do login).
+window.addEventListener('usuario-autenticado', () => {
     carregarClientes();
+});
+document.addEventListener('DOMContentLoaded', () => {
     configurarEventos();
 });
 
@@ -38,7 +43,7 @@ function configurarEventos() {
     const btnLogout = document.getElementById('btn-logout');
     if (btnLogout) {
         btnLogout.addEventListener('click', () => {
-            signOut(auth).then(() => window.location.href = 'Index.html');
+            signOut(auth).then(() => window.location.href = 'index.html');
         });
     }
 
@@ -92,11 +97,14 @@ async function carregarClientes() {
         renderTabelaClientes(cacheClientes);
     } catch (err) {
         console.error("Erro ao buscar clientes:", err);
+        if (tableClientes) {
+            tableClientes.innerHTML = '<tr><td colspan="7" class="p-4 text-center text-red-400">Falha ao carregar clientes. Verifique a conexão.</td></tr>';
+        }
+        mostrarToast('Falha ao carregar clientes. Verifique a conexão.', 'erro');
     }
 }
 
 async function salvarCliente() {
-    const id = fId.value;
     const dados = {
         nome: fNome.value.trim(),
         contato: fContato.value.trim(),
@@ -106,6 +114,16 @@ async function salvarCliente() {
         endereco: fEndereco.value.trim()
     };
 
+    if (!dados.nome) {
+        mostrarToast('Informe o nome do cliente antes de salvar.', 'erro');
+        fNome.focus();
+        return;
+    }
+
+    const id = fId.value;
+    const btnSalvar = document.getElementById('btn-salvar-cliente');
+    if (btnSalvar) btnSalvar.disabled = true;
+
     try {
         if (id) {
             await updateDoc(doc(db, "clientes", id), dados);
@@ -113,10 +131,13 @@ async function salvarCliente() {
             await addDoc(collection(db, "clientes"), dados);
         }
         modalCliente.classList.add('hidden');
+        mostrarToast('Cliente salvo com sucesso.', 'sucesso');
         carregarClientes();
     } catch (err) {
         console.error("Erro ao salvar cliente:", err);
-        alert("Ocorreu um erro ao salvar o cliente.");
+        mostrarToast('Ocorreu um erro ao salvar o cliente.', 'erro');
+    } finally {
+        if (btnSalvar) btnSalvar.disabled = false;
     }
 }
 
@@ -124,9 +145,11 @@ async function deletarCliente(id) {
     if (confirm("Tem certeza que deseja excluir este cliente?")) {
         try {
             await deleteDoc(doc(db, "clientes", id));
+            mostrarToast('Cliente excluído.', 'sucesso');
             carregarClientes();
         } catch (err) {
             console.error("Erro ao excluir cliente:", err);
+            mostrarToast('Erro ao excluir cliente. Verifique suas permissões.', 'erro');
         }
     }
 }
@@ -140,15 +163,15 @@ function renderTabelaClientes(lista) {
         lista.forEach(item => {
             // Note que aqui adicionamos classes (btn-edit, btn-delete) e o data-id
             html += `<tr class="border-b border-cardborder hover:bg-darkbg/50 transition-colors">
-                <td class="p-3 font-semibold text-white">${item.nome || '-'}</td>
-                <td class="p-3">${item.contato || '-'}</td>
-                <td class="p-3">${item.email || '-'}</td>
-                <td class="p-3">${item.fone || '-'}</td>
-                <td class="p-3">${item.docNum || '-'}</td>
-                <td class="p-3">${item.endereco || '-'}</td>
+                <td class="p-3 font-semibold text-white">${escapeHTML(item.nome) || '-'}</td>
+                <td class="p-3">${escapeHTML(item.contato) || '-'}</td>
+                <td class="p-3">${escapeHTML(item.email) || '-'}</td>
+                <td class="p-3">${escapeHTML(item.fone) || '-'}</td>
+                <td class="p-3">${escapeHTML(item.docNum) || '-'}</td>
+                <td class="p-3">${escapeHTML(item.endereco) || '-'}</td>
                 <td class="p-3 flex justify-center gap-2">
-                    <button class="btn-edit px-2.5 py-1 bg-yellow-500/20 text-yellow-400 rounded hover:bg-yellow-500/30 text-xs font-semibold" data-id="${item.id}">✏️ Editar</button>
-                    <button class="btn-delete px-2.5 py-1 bg-red-500/20 text-red-400 rounded hover:bg-red-500/30 text-xs font-semibold" data-id="${item.id}">🗑️ Excluir</button>
+                    <button class="btn-edit px-2.5 py-1 bg-yellow-500/20 text-yellow-400 rounded hover:bg-yellow-500/30 text-xs font-semibold" data-id="${escapeHTML(item.id)}">✏️ Editar</button>
+                    <button class="btn-delete px-2.5 py-1 bg-red-500/20 text-red-400 rounded hover:bg-red-500/30 text-xs font-semibold" data-id="${escapeHTML(item.id)}">🗑️ Excluir</button>
                 </td>
             </tr>`;
         });

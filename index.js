@@ -3,6 +3,7 @@
 import { auth, db } from './firebase-config.js';
 import { signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 import { collection, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import { arredondaMoeda } from './utils.js';
 
 // ----------------------------------------------------
 // VARIÁVEIS GERAIS
@@ -139,10 +140,10 @@ async function carregarMetricasDashboard() {
                     const mesAno = `${partesData[1]}/${partesData[2]}`; // "MM/YYYY"
                     
                     if (faturamentoMensal[mesAno] !== undefined) {
-                        faturamentoMensal[mesAno] += Number(os.total);
+                        faturamentoMensal[mesAno] = arredondaMoeda(faturamentoMensal[mesAno] + Number(os.total));
                     } else {
                         // Se for uma OS de um mês muito antigo, adiciona no gráfico também
-                        faturamentoMensal[mesAno] = Number(os.total);
+                        faturamentoMensal[mesAno] = arredondaMoeda(Number(os.total));
                     }
                 }
             }

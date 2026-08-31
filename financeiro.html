@@ -332,22 +332,10 @@
         });
 
         // 3. FIREBASE E LÓGICA
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getAuth, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-        import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-
-        const firebaseConfig = {
-            apiKey: "AIzaSyBHMJCMzX-5so4gAD8aXv0SOpps-2xxeLE",
-            authDomain: "erp-ti-2c92d.firebaseapp.com",
-            projectId: "erp-ti-2c92d",
-            storageBucket: "erp-ti-2c92d.firebasestorage.app",
-            messagingSenderId: "1075643576721",
-            appId: "1:1075643576721:web:5a9da33c743494275eea30"
-        };
-
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
+        import { auth, db } from './firebase-config.js';
+        import { signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { collection, addDoc, getDocs, deleteDoc, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { escapeHTML, formatarMoeda, mostrarToast, arredondaMoeda } from './utils.js';
 
         let cacheFinanceiro = [];
         let cacheOS = [];
@@ -363,7 +351,7 @@
                 await carregarBasesConsulta();
                 await carregarFinanceiro();
             } else {
-                window.location.href = 'Index.html';
+                window.location.href = 'index.html';
             }
         });
 
@@ -390,10 +378,6 @@
                 window.closeModal('modal-financeiro');
             }
         });
-
-        const formatarMoeda = (valor) => {
-            return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(valor || 0);
-        };
 
         function formatarDataBR(dataIso) {
             if (!dataIso) return '-';
@@ -457,9 +441,9 @@
 
             if (filtrados.length > 0) {
                 resDiv.innerHTML = filtrados.map(o => `
-                    <div onclick="selecionarOSDirect('${o.id}')" class="p-2.5 border-b border-cardborder hover:bg-blue-600/20 cursor-pointer text-xs transition-colors">
-                        <span class="font-bold text-blue-400">OS ${o.numeroOS || 'S/N'}</span> - 
-                        <span class="text-white">${o.clienteNome}</span> 
+                    <div onclick="selecionarOSDirect('${escapeHTML(o.id)}')" class="p-2.5 border-b border-cardborder hover:bg-blue-600/20 cursor-pointer text-xs transition-colors">
+                        <span class="font-bold text-blue-400">OS ${escapeHTML(o.numeroOS) || 'S/N'}</span> - 
+                        <span class="text-white">${escapeHTML(o.clienteNome)}</span> 
                         <span class="text-emerald-400 font-bold ml-1">(${formatarMoeda(o.total)})</span>
                     </div>
                 `).join('');
@@ -495,9 +479,9 @@
 
             if (filtrados.length > 0) {
                 resDiv.innerHTML = filtrados.map(c => `
-                    <div onclick="selecionarClienteDirect('${c.id}')" class="p-2.5 border-b border-cardborder hover:bg-blue-600/20 cursor-pointer text-xs transition-colors">
-                        <span class="font-bold text-white">${c.nome}</span> 
-                        <span class="text-gray-400">${c.docNum ? '('+c.docNum+')' : ''}</span>
+                    <div onclick="selecionarClienteDirect('${escapeHTML(c.id)}')" class="p-2.5 border-b border-cardborder hover:bg-blue-600/20 cursor-pointer text-xs transition-colors">
+                        <span class="font-bold text-white">${escapeHTML(c.nome)}</span> 
+                        <span class="text-gray-400">${c.docNum ? '('+escapeHTML(c.docNum)+')' : ''}</span>
                     </div>
                 `).join('');
                 resDiv.classList.remove('hidden');
@@ -550,28 +534,28 @@
                 const htmlLinha = `
                     <tr class="border-b border-cardborder hover:bg-darkbg/50 transition-colors">
                         <td class="p-3 font-semibold text-white">
-                            ${item.descricao || '-'}
-                            ${item.obs ? `<p class="text-xs text-gray-400 font-normal mt-0.5 truncate max-w-[200px]" title="${item.obs}">${item.obs}</p>` : ''}
+                            ${escapeHTML(item.descricao) || '-'}
+                            ${item.obs ? `<p class="text-xs text-gray-400 font-normal mt-0.5 truncate max-w-[200px]" title="${escapeHTML(item.obs)}">${escapeHTML(item.obs)}</p>` : ''}
                         </td>
-                        <td class="p-3">${item.entidade || (isReceber ? '-' : 'Geral')}</td>
+                        <td class="p-3">${escapeHTML(item.entidade) || (isReceber ? '-' : 'Geral')}</td>
                         <td class="p-3 text-xs font-mono">${dataBR}</td>
-                        <td class="p-3"><span class="px-2.5 py-1 bg-gray-700/50 text-gray-300 rounded text-xs font-medium">${item.forma || 'PIX'}</span></td>
+                        <td class="p-3"><span class="px-2.5 py-1 bg-gray-700/50 text-gray-300 rounded text-xs font-medium">${escapeHTML(item.forma) || 'PIX'}</span></td>
                         <td class="p-3 font-semibold ${isReceber ? 'text-emerald-400' : 'text-red-400'}">${formatarMoeda(valor)}</td>
                         <td class="p-3">${statusBadge}</td>
                         <td class="p-3 flex justify-center gap-2">
-                            <button type="button" onclick="editarLancamento('${item.id}')" class="px-2.5 py-1.5 bg-yellow-500/20 text-yellow-400 rounded hover:bg-yellow-500/30 text-xs font-semibold transition-colors" title="Editar">✏️ Editar</button>
-                            <button type="button" onclick="alternarStatus('${item.id}')" class="px-2.5 py-1.5 bg-blue-500/20 text-blue-400 rounded hover:bg-blue-500/30 text-xs font-semibold transition-colors" title="Alternar Status">🔄 Baixar</button>
-                            <button type="button" onclick="deletarLancamento('${item.id}')" class="px-2.5 py-1.5 bg-red-500/20 text-red-400 rounded hover:bg-red-500/30 text-xs font-semibold transition-colors" title="Excluir">🗑️ Excluir</button>
+                            <button type="button" onclick="editarLancamento('${escapeHTML(item.id)}')" class="px-2.5 py-1.5 bg-yellow-500/20 text-yellow-400 rounded hover:bg-yellow-500/30 text-xs font-semibold transition-colors" title="Editar">✏️ Editar</button>
+                            <button type="button" onclick="alternarStatus('${escapeHTML(item.id)}')" class="px-2.5 py-1.5 bg-blue-500/20 text-blue-400 rounded hover:bg-blue-500/30 text-xs font-semibold transition-colors" title="Alternar Status">🔄 Baixar</button>
+                            <button type="button" onclick="deletarLancamento('${escapeHTML(item.id)}')" class="px-2.5 py-1.5 bg-red-500/20 text-red-400 rounded hover:bg-red-500/30 text-xs font-semibold transition-colors" title="Excluir">🗑️ Excluir</button>
                         </td>
                     </tr>`;
 
                 if (isReceber) {
-                    if (item.status === 'Pago') totalRecebido += valor;
-                    else totalAReceber += valor;
+                    if (item.status === 'Pago') totalRecebido = arredondaMoeda(totalRecebido + valor);
+                    else totalAReceber = arredondaMoeda(totalAReceber + valor);
                     htmlReceber += htmlLinha;
                 } else {
-                    if (item.status === 'Pago') totalPago += valor;
-                    else totalAPagar += valor;
+                    if (item.status === 'Pago') totalPago = arredondaMoeda(totalPago + valor);
+                    else totalAPagar = arredondaMoeda(totalAPagar + valor);
                     htmlPagar += htmlLinha;
                 }
             });
@@ -583,7 +567,7 @@
             document.getElementById('card-recebido').innerText = formatarMoeda(totalRecebido);
             document.getElementById('card-a-pagar').innerText = formatarMoeda(totalAPagar);
             
-            const saldoLiquido = totalRecebido - (totalPago + totalAPagar);
+            const saldoLiquido = arredondaMoeda(totalRecebido - arredondaMoeda(totalPago + totalAPagar));
             const cardSaldo = document.getElementById('card-saldo');
             cardSaldo.innerText = formatarMoeda(saldoLiquido);
             
@@ -647,6 +631,15 @@
                 obs: document.getElementById('f-obs').value.trim()
             };
 
+            if (!dados.descricao) {
+                mostrarToast('Informe uma descrição para o lançamento.', 'erro');
+                return;
+            }
+            if (dados.valor <= 0) {
+                mostrarToast('Informe um valor válido.', 'erro');
+                return;
+            }
+
             try {
                 btnSalvar.disabled = true;
                 btnSalvar.innerText = "⏳ Salvando...";
@@ -658,10 +651,11 @@
                 }
                 
                 window.closeModal('modal-financeiro');
+                mostrarToast('Lançamento salvo com sucesso.', 'sucesso');
                 carregarFinanceiro();
             } catch (err) {
                 console.error("Erro ao salvar título:", err);
-                alert("Erro ao salvar lançamento. Tente novamente.");
+                mostrarToast('Erro ao salvar lançamento. Tente novamente.', 'erro');
             } finally {
                 btnSalvar.disabled = false;
                 btnSalvar.innerText = "Salvar Título";
@@ -703,10 +697,11 @@
             const novoStatus = item.status === 'Pago' ? 'Pendente' : 'Pago';
             try {
                 await updateDoc(doc(db, "financeiro", id), { status: novoStatus });
+                mostrarToast(`Marcado como ${novoStatus}.`, 'sucesso');
                 carregarFinanceiro(); // Atualiza a lista e os cards de saldo
             } catch (err) {
                 console.error("Erro ao alterar status do título:", err);
-                alert("Erro ao alterar o status.");
+                mostrarToast('Erro ao alterar o status.', 'erro');
             }
         }
 
@@ -714,10 +709,11 @@
             if (confirm("Deseja realmente excluir este lançamento financeiro? A ação não poderá ser desfeita.")) {
                 try {
                     await deleteDoc(doc(db, "financeiro", id));
+                    mostrarToast('Lançamento excluído.', 'sucesso');
                     carregarFinanceiro();
                 } catch (err) {
                     console.error("Erro ao deletar lançamento:", err);
-                    alert("Erro ao excluir.");
+                    mostrarToast('Erro ao excluir.', 'erro');
                 }
             }
         }

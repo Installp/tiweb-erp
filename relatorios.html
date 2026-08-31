@@ -313,22 +313,10 @@
         });
 
         // 3. FIREBASE E LÓGICA DO RELATÓRIO
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getAuth, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-        import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-
-        const firebaseConfig = {
-            apiKey: "AIzaSyBHMJCMzX-5so4gAD8aXv0SOpps-2xxeLE",
-            authDomain: "erp-ti-2c92d.firebaseapp.com",
-            projectId: "erp-ti-2c92d",
-            storageBucket: "erp-ti-2c92d.firebasestorage.app",
-            messagingSenderId: "1075643576721",
-            appId: "1:1075643576721:web:5a9da33c743494275eea30"
-        };
-
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
+        import { auth, db } from './firebase-config.js';
+        import { signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { collection, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { escapeHTML, formatarMoeda, mostrarToast, arredondaMoeda } from './utils.js';
 
         let cacheOS = [];
         let cacheClientes = [];
@@ -337,11 +325,6 @@
         let cacheDespesas = [];
 
         let relatorioAtual = 'dre';
-
-        // Utilitário para formatar Moeda (BRL)
-        const formatarMoeda = (valor) => {
-            return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(valor || 0);
-        };
 
         // CHECAR AUTENTICAÇÃO
         onAuthStateChanged(auth, async (user) => {
@@ -353,7 +336,7 @@
                 await carregarTodosOsDados();
                 filtrarPeriodo('mes_atual');
             } else {
-                window.location.href = 'Index.html';
+                window.location.href = 'index.html';
             }
         });
 
@@ -392,7 +375,7 @@
                 
             } catch (err) {
                 console.error("Erro ao carregar bases para relatórios:", err);
-                alert("Ocorreu um erro ao carregar os dados financeiros. Tente recarregar a página.");
+                mostrarToast("Ocorreu um erro ao carregar os dados financeiros. Tente recarregar a página.", 'erro');
             }
         }
 
@@ -476,7 +459,7 @@
             const fimVal = document.getElementById('filtro-fim').value;
 
             if (!inVal || !fimVal) {
-                alert("Por favor, selecione as duas datas (início e fim) para aplicar o filtro.");
+                mostrarToast("Por favor, selecione as duas datas (início e fim) para aplicar o filtro.", 'erro');
                 return;
             }
 
@@ -506,10 +489,10 @@
                 const dt = parseDataBR(os.data);
                 if (!dt) return;
                 if (!inicio || (dt >= inicio && dt <= fim)) {
-                    totalOSVal += Number(os.total) || 0;
-                    totalDeslocamentoVal += Number(os.custoDeslocamento) || 0;
+                    totalOSVal = arredondaMoeda(totalOSVal + (Number(os.total) || 0));
+                    totalDeslocamentoVal = arredondaMoeda(totalDeslocamentoVal + (Number(os.custoDeslocamento) || 0));
                     if (os.pecas) {
-                        os.pecas.forEach(p => totalPecasVal += (Number(p.subtotal) || Number(p.valor) || 0));
+                        os.pecas.forEach(p => { totalPecasVal = arredondaMoeda(totalPecasVal + (Number(p.subtotal) || Number(p.valor) || 0)); });
                     }
                 }
             });
@@ -518,21 +501,21 @@
                 const dt = parseDataBR(f.vencimento);
                 if (!dt) return;
                 if (!inicio || (dt >= inicio && dt <= fim)) {
-                    if (f.tipo === 'receber' && f.status === 'Pago') totalEntradasDirectVal += Number(f.valor) || 0;
-                    else if (f.tipo === 'pagar' && f.status === 'Pago') totalDespOutrosVal += Number(f.valor) || 0;
+                    if (f.tipo === 'receber' && f.status === 'Pago') totalEntradasDirectVal = arredondaMoeda(totalEntradasDirectVal + (Number(f.valor) || 0));
+                    else if (f.tipo === 'pagar' && f.status === 'Pago') totalDespOutrosVal = arredondaMoeda(totalDespOutrosVal + (Number(f.valor) || 0));
                 }
             });
 
             cacheDespesas.forEach(d => {
-                if (d.categoria === 'Veículo / Combustível') totalDespVeiculoVal += Number(d.valor) || 0;
-                else totalDespOutrosVal += Number(d.valor) || 0;
+                if (d.categoria === 'Veículo / Combustível') totalDespVeiculoVal = arredondaMoeda(totalDespVeiculoVal + (Number(d.valor) || 0));
+                else totalDespOutrosVal = arredondaMoeda(totalDespOutrosVal + (Number(d.valor) || 0));
             });
 
-            const receitaBruta = totalOSVal + totalEntradasDirectVal;
-            const custosDiretos = totalPecasVal + totalDeslocamentoVal;
-            const lucroBruto = receitaBruta - custosDiretos;
-            const despesasOperacionais = totalDespVeiculoVal + totalDespOutrosVal;
-            const lucroLiquidoReal = lucroBruto - despesasOperacionais;
+            const receitaBruta = arredondaMoeda(totalOSVal + totalEntradasDirectVal);
+            const custosDiretos = arredondaMoeda(totalPecasVal + totalDeslocamentoVal);
+            const lucroBruto = arredondaMoeda(receitaBruta - custosDiretos);
+            const despesasOperacionais = arredondaMoeda(totalDespVeiculoVal + totalDespOutrosVal);
+            const lucroLiquidoReal = arredondaMoeda(lucroBruto - despesasOperacionais);
 
             // Preenche os cards
             document.getElementById('dre-faturamento').innerText = formatarMoeda(receitaBruta);
@@ -562,11 +545,11 @@
                 if (!dt) return;
                 if (!inicio || (dt >= inicio && dt <= fim)) {
                     html += `<tr class="border-b border-cardborder">
-                        <td class="p-3 font-mono text-blue-400 font-bold">${o.numeroOS || '-'}</td>
-                        <td class="p-3 text-white font-semibold">${o.clienteNome || '-'}</td>
-                        <td class="p-3">${o.equipamento || '-'}</td>
-                        <td class="p-3 font-mono">${o.data || '-'}</td>
-                        <td class="p-3">${o.status || '-'}</td>
+                        <td class="p-3 font-mono text-blue-400 font-bold">${escapeHTML(o.numeroOS) || '-'}</td>
+                        <td class="p-3 text-white font-semibold">${escapeHTML(o.clienteNome) || '-'}</td>
+                        <td class="p-3">${escapeHTML(o.equipamento) || '-'}</td>
+                        <td class="p-3 font-mono">${escapeHTML(o.data) || '-'}</td>
+                        <td class="p-3">${escapeHTML(o.status) || '-'}</td>
                         <td class="p-3 text-right font-bold text-emerald-400">${formatarMoeda(o.total)}</td>
                     </tr>`;
                 }
@@ -579,12 +562,12 @@
             let html = '';
             cacheClientes.forEach(c => {
                 html += `<tr class="border-b border-cardborder">
-                    <td class="p-3 font-semibold text-white">${c.nome || '-'}</td>
-                    <td class="p-3">${c.contato || '-'}</td>
-                    <td class="p-3">${c.fone || '-'}</td>
-                    <td class="p-3">${c.email || '-'}</td>
-                    <td class="p-3 font-mono text-gray-400">${c.docNum || '-'}</td>
-                    <td class="p-3 text-xs">${c.endereco || '-'}</td>
+                    <td class="p-3 font-semibold text-white">${escapeHTML(c.nome) || '-'}</td>
+                    <td class="p-3">${escapeHTML(c.contato) || '-'}</td>
+                    <td class="p-3">${escapeHTML(c.fone) || '-'}</td>
+                    <td class="p-3">${escapeHTML(c.email) || '-'}</td>
+                    <td class="p-3 font-mono text-gray-400">${escapeHTML(c.docNum) || '-'}</td>
+                    <td class="p-3 text-xs">${escapeHTML(c.endereco) || '-'}</td>
                 </tr>`;
             });
             document.getElementById('table-rel-clientes').innerHTML = html || '<tr><td colspan="6" class="p-6 text-center text-gray-500">Nenhum cliente cadastrado no sistema.</td></tr>';
@@ -600,11 +583,11 @@
                     const tipoBadge = f.tipo === 'receber' ? '<span class="text-emerald-400 font-bold bg-emerald-500/10 px-2 py-1 rounded">ENTRADA</span>' : '<span class="text-red-400 font-bold bg-red-500/10 px-2 py-1 rounded">SAÍDA</span>';
                     html += `<tr class="border-b border-cardborder">
                         <td class="p-3">${tipoBadge}</td>
-                        <td class="p-3 text-white font-semibold">${f.descricao || '-'}</td>
-                        <td class="p-3">${f.entidade || '-'}</td>
-                        <td class="p-3 font-mono">${f.vencimento || '-'}</td>
-                        <td class="p-3"><span class="px-2.5 py-1 bg-gray-700/50 text-gray-300 rounded text-xs font-medium">${f.forma || 'PIX'}</span></td>
-                        <td class="p-3 font-semibold ${f.status === 'Pago' ? 'text-emerald-400' : 'text-yellow-400'}">${f.status || 'Pendente'}</td>
+                        <td class="p-3 text-white font-semibold">${escapeHTML(f.descricao) || '-'}</td>
+                        <td class="p-3">${escapeHTML(f.entidade) || '-'}</td>
+                        <td class="p-3 font-mono">${escapeHTML(f.vencimento) || '-'}</td>
+                        <td class="p-3"><span class="px-2.5 py-1 bg-gray-700/50 text-gray-300 rounded text-xs font-medium">${escapeHTML(f.forma) || 'PIX'}</span></td>
+                        <td class="p-3 font-semibold ${f.status === 'Pago' ? 'text-emerald-400' : 'text-yellow-400'}">${escapeHTML(f.status) || 'Pendente'}</td>
                         <td class="p-3 text-right font-bold ${f.tipo === 'receber' ? 'text-emerald-400' : 'text-red-400'}">${formatarMoeda(f.valor)}</td>
                     </tr>`;
                 }
@@ -617,8 +600,8 @@
             let html = '';
             cacheServicos.forEach(s => {
                 html += `<tr class="border-b border-cardborder">
-                    <td class="p-3 font-semibold text-white">${s.nome || '-'}</td>
-                    <td class="p-3 text-gray-400">${s.obs || '-'}</td>
+                    <td class="p-3 font-semibold text-white">${escapeHTML(s.nome) || '-'}</td>
+                    <td class="p-3 text-gray-400">${escapeHTML(s.obs) || '-'}</td>
                     <td class="p-3 text-right font-bold text-emerald-400">${formatarMoeda(s.valor)}</td>
                 </tr>`;
             });

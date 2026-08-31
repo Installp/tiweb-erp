@@ -199,29 +199,12 @@
         });
 
         // 3. FIREBASE & LÓGICA
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getAuth, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-        import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-
-        const firebaseConfig = {
-            apiKey: "AIzaSyBHMJCMzX-5so4gAD8aXv0SOpps-2xxeLE",
-            authDomain: "erp-ti-2c92d.firebaseapp.com",
-            projectId: "erp-ti-2c92d",
-            storageBucket: "erp-ti-2c92d.firebasestorage.app",
-            messagingSenderId: "1075643576721",
-            appId: "1:1075643576721:web:5a9da33c743494275eea30"
-        };
-
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
+        import { auth, db } from './firebase-config.js';
+        import { signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { collection, addDoc, getDocs, deleteDoc, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { escapeHTML, formatarMoeda, mostrarToast } from './utils.js';
 
         let cacheServicos = [];
-
-        // Utilitário para formatar Moeda (BRL)
-        const formatarMoeda = (valor) => {
-            return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(valor || 0);
-        };
 
         // CHECAR AUTENTICAÇÃO
         onAuthStateChanged(auth, (user) => {
@@ -232,7 +215,7 @@
                 document.getElementById('app-dashboard').classList.remove('hidden');
                 carregarServicos();
             } else {
-                window.location.href = 'Index.html';
+                window.location.href = 'index.html';
             }
         });
 
@@ -291,12 +274,12 @@
             } else {
                 lista.forEach(item => {
                     html += `<tr class="border-b border-cardborder hover:bg-darkbg/50 transition-colors">
-                        <td class="p-3 font-semibold text-white">${item.nome || '-'}</td>
-                        <td class="p-3 text-gray-400 text-xs">${item.obs || '-'}</td>
+                        <td class="p-3 font-semibold text-white">${escapeHTML(item.nome) || '-'}</td>
+                        <td class="p-3 text-gray-400 text-xs">${escapeHTML(item.obs) || '-'}</td>
                         <td class="p-3 font-semibold text-emerald-400">${formatarMoeda(item.valor)}</td>
                         <td class="p-3 flex justify-center gap-2">
-                            <button type="button" onclick="editarServico('${item.id}')" class="px-2.5 py-1.5 bg-yellow-500/20 text-yellow-400 rounded hover:bg-yellow-500/30 text-xs font-semibold transition-colors">✏️ Editar</button>
-                            <button type="button" onclick="deletarServico('${item.id}')" class="px-2.5 py-1.5 bg-red-500/20 text-red-400 rounded hover:bg-red-500/30 text-xs font-semibold transition-colors">🗑️ Excluir</button>
+                            <button type="button" onclick="editarServico('${escapeHTML(item.id)}')" class="px-2.5 py-1.5 bg-yellow-500/20 text-yellow-400 rounded hover:bg-yellow-500/30 text-xs font-semibold transition-colors">✏️ Editar</button>
+                            <button type="button" onclick="deletarServico('${escapeHTML(item.id)}')" class="px-2.5 py-1.5 bg-red-500/20 text-red-400 rounded hover:bg-red-500/30 text-xs font-semibold transition-colors">🗑️ Excluir</button>
                         </td>
                     </tr>`;
                 });
@@ -329,6 +312,13 @@
                 valor: parseFloat(document.getElementById('s-valor').value) || 0
             };
 
+            if (!dados.nome) {
+                mostrarToast('Informe o nome do serviço.', 'erro');
+                btnSalvar.disabled = false;
+                btnSalvar.innerText = "Salvar Serviço";
+                return;
+            }
+
             try {
                 if (id) {
                     await updateDoc(doc(db, "servicos", id), dados);
@@ -336,10 +326,11 @@
                     await addDoc(collection(db, "servicos"), dados);
                 }
                 window.closeModal('modal-servico');
+                mostrarToast('Serviço salvo com sucesso.', 'sucesso');
                 carregarServicos();
             } catch (err) {
                 console.error("Erro ao salvar serviço:", err);
-                alert("Ocorreu um erro ao salvar o serviço. Verifique a conexão.");
+                mostrarToast('Ocorreu um erro ao salvar o serviço. Verifique a conexão.', 'erro');
             } finally {
                 btnSalvar.disabled = false;
                 btnSalvar.innerText = "Salvar Serviço";
@@ -365,10 +356,11 @@
             if (confirm("Tem certeza que deseja excluir este serviço permanentemente do catálogo?")) {
                 try {
                     await deleteDoc(doc(db, "servicos", id));
+                    mostrarToast('Serviço excluído.', 'sucesso');
                     carregarServicos();
                 } catch (err) {
                     console.error("Erro ao excluir serviço:", err);
-                    alert("Erro ao excluir o serviço. Tente novamente.");
+                    mostrarToast('Erro ao excluir o serviço. Tente novamente.', 'erro');
                 }
             }
         }

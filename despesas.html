@@ -204,22 +204,10 @@
         });
 
         // 3. FIREBASE & LÓGICA DA PÁGINA
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getAuth, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-        import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-
-        const firebaseConfig = {
-            apiKey: "AIzaSyBHMJCMzX-5so4gAD8aXv0SOpps-2xxeLE",
-            authDomain: "erp-ti-2c92d.firebaseapp.com",
-            projectId: "erp-ti-2c92d",
-            storageBucket: "erp-ti-2c92d.firebasestorage.app",
-            messagingSenderId: "1075643576721",
-            appId: "1:1075643576721:web:5a9da33c743494275eea30"
-        };
-
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
+        import { auth, db } from './firebase-config.js';
+        import { signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { collection, addDoc, getDocs, deleteDoc, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { escapeHTML, formatarMoeda, mostrarToast, arredondaMoeda } from './utils.js';
 
         let cacheDespesas = [];
 
@@ -232,7 +220,7 @@
                 document.getElementById('app-dashboard').classList.remove('hidden');
                 carregarDespesas(); // Carrega os dados somente se logado
             } else {
-                window.location.href = 'Index.html';
+                window.location.href = 'index.html';
             }
         });
 
@@ -264,11 +252,6 @@
             }
         });
 
-        // FORMATAR MOEDA BRL
-        const formatarMoeda = (valor) => {
-            return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(valor || 0);
-        };
-
         // ================= GESTÃO DE DESPESAS =================
         window.abrirModalNovaDespesa = function() {
             document.getElementById('form-despesa').reset();
@@ -289,15 +272,15 @@
                 snap.forEach(d => {
                     const item = { id: d.id, ...d.data() };
                     cacheDespesas.push(item);
-                    total += Number(item.valor) || 0;
+                    total = arredondaMoeda(total + (Number(item.valor) || 0));
 
                     html += `<tr class="border-b border-cardborder hover:bg-darkbg/50 transition-colors">
-                        <td class="p-3 font-semibold text-white">${item.nome || '-'}</td>
-                        <td class="p-3"><span class="px-2.5 py-1 bg-gray-700/50 border border-gray-600/50 text-gray-300 rounded-full text-xs font-medium">${item.categoria || 'Geral'}</span></td>
+                        <td class="p-3 font-semibold text-white">${escapeHTML(item.nome) || '-'}</td>
+                        <td class="p-3"><span class="px-2.5 py-1 bg-gray-700/50 border border-gray-600/50 text-gray-300 rounded-full text-xs font-medium">${escapeHTML(item.categoria) || 'Geral'}</span></td>
                         <td class="p-3 font-semibold text-red-400">${formatarMoeda(item.valor)}</td>
                         <td class="p-3 flex justify-center gap-2">
-                            <button type="button" onclick="editarDespesa('${item.id}')" class="px-2.5 py-1.5 bg-yellow-500/20 text-yellow-400 rounded hover:bg-yellow-500/30 text-xs font-semibold transition-colors">✏️ Editar</button>
-                            <button type="button" onclick="deletarDespesa('${item.id}')" class="px-2.5 py-1.5 bg-red-500/20 text-red-400 rounded hover:bg-red-500/30 text-xs font-semibold transition-colors">🗑️ Excluir</button>
+                            <button type="button" onclick="editarDespesa('${escapeHTML(item.id)}')" class="px-2.5 py-1.5 bg-yellow-500/20 text-yellow-400 rounded hover:bg-yellow-500/30 text-xs font-semibold transition-colors">✏️ Editar</button>
+                            <button type="button" onclick="deletarDespesa('${escapeHTML(item.id)}')" class="px-2.5 py-1.5 bg-red-500/20 text-red-400 rounded hover:bg-red-500/30 text-xs font-semibold transition-colors">🗑️ Excluir</button>
                         </td>
                     </tr>`;
                 });
@@ -321,6 +304,15 @@
                 valor: parseFloat(document.getElementById('d-valor').value) || 0
             };
 
+            if (!dados.nome) {
+                mostrarToast('Informe o nome/descrição da despesa.', 'erro');
+                return;
+            }
+            if (dados.valor <= 0) {
+                mostrarToast('Informe um valor válido para a despesa.', 'erro');
+                return;
+            }
+
             try {
                 btnSalvar.disabled = true;
                 btnSalvar.innerText = "⏳ Salvando...";
@@ -332,10 +324,11 @@
                 }
                 
                 window.closeModal('modal-despesa');
+                mostrarToast('Despesa salva com sucesso.', 'sucesso');
                 carregarDespesas();
             } catch (err) {
                 console.error("Erro ao salvar despesa:", err);
-                alert("Erro ao salvar despesa. Tente novamente.");
+                mostrarToast('Erro ao salvar despesa. Tente novamente.', 'erro');
             } finally {
                 btnSalvar.disabled = false;
                 btnSalvar.innerText = "Salvar Despesa";
@@ -359,10 +352,11 @@
             if (confirm("Deseja realmente excluir esta despesa permanentemente?")) {
                 try {
                     await deleteDoc(doc(db, "despesas", id));
+                    mostrarToast('Despesa excluída.', 'sucesso');
                     carregarDespesas();
                 } catch (err) {
                     console.error("Erro ao excluir despesa:", err);
-                    alert("Erro ao excluir. Verifique suas permissões.");
+                    mostrarToast('Erro ao excluir. Verifique suas permissões.', 'erro');
                 }
             }
         }

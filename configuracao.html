@@ -292,22 +292,10 @@
         });
 
         // 3. FIREBASE
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getAuth, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-        import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-
-        const firebaseConfig = {
-            apiKey: "AIzaSyBHMJCMzX-5so4gAD8aXv0SOpps-2xxeLE",
-            authDomain: "erp-ti-2c92d.firebaseapp.com",
-            projectId: "erp-ti-2c92d",
-            storageBucket: "erp-ti-2c92d.firebasestorage.app",
-            messagingSenderId: "1075643576721",
-            appId: "1:1075643576721:web:5a9da33c743494275eea30"
-        };
-
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
+        import { auth, db } from './firebase-config.js';
+        import { signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { mostrarToast } from './utils.js';
 
         // CHECAR AUTENTICAÇÃO
         onAuthStateChanged(auth, async (user) => {
@@ -318,7 +306,7 @@
                 document.getElementById('app-dashboard').classList.remove('hidden');
                 await carregarDadosEmpresa();
             } else {
-                window.location.href = 'Index.html';
+                window.location.href = 'index.html';
             }
         });
 
@@ -357,10 +345,10 @@
                 const docRef = doc(db, "configuracoes", "empresa");
                 await setDoc(docRef, dadosEmpresa, { merge: true });
 
-                alert("Informações da empresa salvas com sucesso!");
+                mostrarToast("Informações da empresa salvas com sucesso!", 'sucesso');
             } catch (err) {
                 console.error("Erro ao salvar dados:", err);
-                alert("Dados salvos localmente, mas ocorreu um erro ao salvar na nuvem: " + err.message);
+                mostrarToast("Dados salvos localmente, mas ocorreu um erro ao salvar na nuvem: " + err.message, 'erro');
             } finally {
                 if (btn) {
                     btn.disabled = false;
@@ -428,11 +416,11 @@
                         window.location.reload(true);
                     }
                 } else {
-                    alert(`✅ Você já está utilizando a versão mais recente (${VERSAO_ATUAL})!`);
+                    mostrarToast(`✅ Você já está utilizando a versão mais recente (${VERSAO_ATUAL})!`, 'sucesso');
                 }
             } catch (erro) {
                 console.error("Erro verificação:", erro);
-                alert("⚠️ Não foi possível verificar atualizações. Verifique sua conexão.");
+                mostrarToast("⚠️ Não foi possível verificar atualizações. Verifique sua conexão.", 'erro');
             } finally {
                 if (btn) {
                     btn.disabled = false;
@@ -454,7 +442,7 @@
         window.confirmarResetSistema = function() {
             if (confirm("ATENÇÃO: Deseja realmente resetar a sessão do sistema? Você precisará realizar login novamente.")) {
                 signOut(auth).then(() => {
-                    window.location.href = 'Index.html';
+                    window.location.href = 'index.html';
                 });
             }
         }
