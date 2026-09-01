@@ -8,35 +8,14 @@
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <!-- Lucide Icons -->
-    <script src="https://unpkg.com/lucide@latest"></script>
-    
     <!-- Seu CSS Global Centralizado -->
     <link rel="stylesheet" href="style.css">
     
     <!-- Script que aplica o tema instantaneamente -->
     <script src="theme-loader.js"></script>
-
-    <!-- CONFIGURAÇÃO DO TAILWIND (Cores personalizadas do modo escuro) -->
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        darkbg: '#0d1117',
-                        cardbg: '#161b22',
-                        cardborder: '#30363d'
-                    }
-                }
-            }
-        }
-    </script>
-    
-    <!-- TAG OBRIGATÓRIA PARA INJEÇÃO DE TEMA GLOBAL -->
-    <style id="theme-override"></style>
+    <script src="https://unpkg.com/lucide@latest"></script>
 </head>
-<body id="app-body" class="bg-darkbg text-gray-200 min-h-screen font-sans flex flex-col md:overflow-hidden transition-colors duration-200">
+<body class="bg-darkbg text-gray-200 min-h-screen font-sans flex flex-col">
 
     <!-- 0. TELA DE CARREGAMENTO -->
     <div id="screen-loading" class="flex-1 flex flex-col items-center justify-center min-h-screen z-50 bg-darkbg">
@@ -44,19 +23,19 @@
         <p class="text-sm text-gray-400">Verificando acesso...</p>
     </div>
 
-    <!-- 1. PAINEL PRINCIPAL / CLIENTES -->
-    <div id="app-dashboard" class="hidden flex-1 flex flex-col md:flex-row min-h-screen md:h-screen md:overflow-hidden">
+    <!-- PAINEL PRINCIPAL -->
+    <div id="app-dashboard" class="hidden flex-1 flex flex-col md:flex-row min-h-screen">
         
-        <!-- ========================================== -->
-        <!-- MENU LATERAL INDEPENDENTE INJETADO AQUI    -->
-        <!-- ========================================== -->
-        <aside id="app-sidebar-container" class="w-full md:w-64 bg-cardbg border-b md:border-b-0 md:border-r border-cardborder p-4 flex flex-col justify-between md:h-screen md:sticky md:top-0 flex-shrink-0 overflow-y-auto no-print">
-        </aside>
+       
+<!-- MENU LATERAL INDEPENDENTE INJETADO AQUI    -->
+<!-- ========================================== -->
+<aside id="app-sidebar-container" class="w-full md:w-64 bg-cardbg border-b md:border-b-0 md:border-r border-cardborder p-4 flex flex-col justify-between md:h-screen md:sticky md:top-0 flex-shrink-0 overflow-y-auto no-print">
+</aside>
 
-        <!-- ÁREA DE CONTEÚDO (ROLÁVEL) -->
-        <main class="flex-1 p-4 md:p-8 overflow-y-auto space-y-6 md:h-screen">
+        <!-- ÁREA DE CONTEÚDO PRINCIPAL: CLIENTES -->
+        <main class="flex-1 p-4 md:p-8 overflow-y-auto space-y-6">
             
-            <button id="btn-back" class="no-print flex items-center gap-2 px-3 py-2 text-sm font-medium bg-darkbg border border-cardborder hover:border-blue-500 hover:text-blue-400 text-gray-400 rounded-lg transition-colors w-fit focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <button id="btn-back" class="flex items-center gap-2 px-3 py-2 text-sm font-medium bg-darkbg border border-cardborder hover:border-blue-500 hover:text-blue-400 text-gray-400 rounded-lg transition-colors w-fit">
                 ⬅️ Voltar
             </button>
             
@@ -65,21 +44,21 @@
                     <h1 class="text-2xl font-bold text-white">Cadastro de Clientes</h1>
                     <p class="text-xs text-gray-400">Gerencie contatos, empresas e dados cadastrais</p>
                 </div>
-                <button id="btn-novo-cliente" class="bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-bold px-4 py-2.5 rounded-lg transition-colors shadow-lg shadow-emerald-600/20 flex items-center gap-2">
-                    <i data-lucide="plus" class="w-4 h-4"></i> Novo Cliente
+                <button id="btn-novo-cliente" class="bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-bold px-4 py-2.5 rounded-lg transition-colors shadow-lg shadow-emerald-600/20">
+                    + Novo Cliente
                 </button>
             </div>
 
             <!-- BARRA DE PESQUISA -->
             <div class="bg-cardbg border border-cardborder p-4 rounded-xl">
-                <input type="text" id="search-cliente" placeholder="🔍 Buscar cliente por Nome, Contato ou CPF/CNPJ..." class="w-full bg-darkbg border border-cardborder rounded-lg p-3 text-sm text-white focus:outline-none focus:border-blue-500 transition-colors">
+                <input type="text" id="search-cliente" placeholder="🔍 Buscar cliente por Nome, Contato ou CPF/CNPJ..." class="w-full bg-darkbg border border-cardborder rounded-lg p-3 text-sm text-white focus:outline-none focus:border-blue-500">
             </div>
 
             <!-- TABELA DE CLIENTES -->
             <div class="bg-cardbg border border-cardborder rounded-xl p-5 overflow-hidden">
                 <div class="overflow-x-auto">
                     <table class="w-full text-left text-sm text-gray-300">
-                        <thead class="text-xs text-gray-400 border-b border-cardborder uppercase bg-darkbg/40">
+                        <thead class="text-xs text-gray-400 border-b border-cardborder uppercase">
                             <tr>
                                 <th class="p-3">Razão Social / Nome</th>
                                 <th class="p-3">Contato</th>
@@ -99,10 +78,10 @@
 
     <!-- MODAL CLIENTE (CRIAR / EDITAR) -->
     <div id="modal-cliente" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center p-4 z-50 overflow-y-auto">
-        <div class="bg-cardbg border border-cardborder p-6 rounded-xl w-full max-w-lg space-y-4 my-8 shadow-2xl relative">
+        <div class="bg-cardbg border border-cardborder p-6 rounded-xl w-full max-w-lg space-y-4 my-8">
             <div class="flex justify-between items-center border-b border-cardborder pb-3">
                 <h3 id="modal-cliente-titulo" class="text-lg font-bold text-white">Cadastrar Cliente</h3>
-                <button class="btn-close-modal text-gray-400 hover:text-white font-bold p-1 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-400">✕</button>
+                <button class="btn-close-modal text-gray-400 hover:text-white font-bold">✕</button>
             </div>
 
             <input type="hidden" id="c-id" value="">
@@ -110,126 +89,67 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div class="md:col-span-2">
                     <label class="block text-xs font-semibold text-gray-400 mb-1">NOME / RAZÃO SOCIAL</label>
-                    <input type="text" id="c-nome" placeholder="ex: Empresa XYZ Ltda" class="w-full bg-darkbg border border-cardborder rounded-lg p-3 text-sm text-white focus:outline-none focus:border-blue-500 transition-colors">
+                    <input type="text" id="c-nome" placeholder="ex: Empresa XYZ Ltda" class="w-full bg-darkbg border border-cardborder rounded-lg p-3 text-white focus:outline-none focus:border-blue-500">
                 </div>
                 <div>
                     <label class="block text-xs font-semibold text-gray-400 mb-1">NOME DO CONTATO</label>
-                    <input type="text" id="c-contato" placeholder="ex: João Silva" class="w-full bg-darkbg border border-cardborder rounded-lg p-3 text-sm text-white focus:outline-none focus:border-blue-500 transition-colors">
+                    <input type="text" id="c-contato" placeholder="ex: João Silva" class="w-full bg-darkbg border border-cardborder rounded-lg p-3 text-white focus:outline-none focus:border-blue-500">
                 </div>
                 <div>
                     <label class="block text-xs font-semibold text-gray-400 mb-1">TELEFONE / WHATSAPP</label>
-                    <input type="text" id="c-fone" placeholder="ex: (41) 99999-9999" class="w-full bg-darkbg border border-cardborder rounded-lg p-3 text-sm text-white focus:outline-none focus:border-blue-500 transition-colors">
+                    <input type="text" id="c-fone" placeholder="ex: (41) 99999-9999" class="w-full bg-darkbg border border-cardborder rounded-lg p-3 text-white focus:outline-none focus:border-blue-500">
                 </div>
                 <div>
                     <label class="block text-xs font-semibold text-gray-400 mb-1">E-MAIL</label>
-                    <input type="email" id="c-email" placeholder="ex: contato@empresa.com" class="w-full bg-darkbg border border-cardborder rounded-lg p-3 text-sm text-white focus:outline-none focus:border-blue-500 transition-colors">
+                    <input type="email" id="c-email" placeholder="ex: contato@empresa.com" class="w-full bg-darkbg border border-cardborder rounded-lg p-3 text-white focus:outline-none focus:border-blue-500">
                 </div>
                 <div>
                     <label class="block text-xs font-semibold text-gray-400 mb-1">CPF OU CNPJ</label>
-                    <input type="text" id="c-doc" placeholder="ex: 00.000.000/0001-00" class="w-full bg-darkbg border border-cardborder rounded-lg p-3 text-sm text-white focus:outline-none focus:border-blue-500 transition-colors">
+                    <input type="text" id="c-doc" placeholder="ex: 00.000.000/0001-00" class="w-full bg-darkbg border border-cardborder rounded-lg p-3 text-white focus:outline-none focus:border-blue-500">
                 </div>
                 <div class="md:col-span-2">
                     <label class="block text-xs font-semibold text-gray-400 mb-1">ENDEREÇO COMPLETO</label>
-                    <input type="text" id="c-endereco" placeholder="ex: Rua Exemplo, 123 - Bairro - Cidade/UF" class="w-full bg-darkbg border border-cardborder rounded-lg p-3 text-sm text-white focus:outline-none focus:border-blue-500 transition-colors">
+                    <input type="text" id="c-endereco" placeholder="ex: Rua Exemplo, 123 - Bairro - Cidade/UF" class="w-full bg-darkbg border border-cardborder rounded-lg p-3 text-white focus:outline-none focus:border-blue-500">
                 </div>
             </div>
 
-            <div class="flex justify-end gap-2 pt-4 mt-2 border-t border-cardborder">
-                <button class="btn-close-modal px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-lg text-sm transition-colors">Cancelar</button>
-                <button id="btn-salvar-cliente" class="px-5 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg font-bold text-sm shadow-lg shadow-emerald-600/20 transition-colors">Salvar Cliente</button>
+            <div class="flex justify-end gap-2 pt-3 border-t border-cardborder">
+                <button class="btn-close-modal px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-lg">Cancelar</button>
+                <button id="btn-salvar-cliente" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg font-bold">Salvar Cliente</button>
             </div>
         </div>
     </div>
 
-    <!-- SCRIPT DE TEMAS GLOBAL -->
-    <script>
-        function obterCSSDoTema(nomeTema) {
-            if (nomeTema === 'claro') {
-                return `
-                    body { background-color: #f4f5f7 !important; color: #0f172a !important; }
-                    #app-sidebar-container { background-color: #ffffff !important; border-color: #e5e7eb !important; }
-                    .bg-cardbg { background-color: #ffffff !important; border-color: #e5e7eb !important; box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.04) !important; }
-                    .bg-darkbg { background-color: #f8fafc !important; border-color: #cbd5e1 !important; color: #0f172a !important; }
-                    .text-white { color: #0f172a !important; }
-                    .text-gray-400 { color: #64748b !important; }
-                    .text-gray-300 { color: #334155 !important; }
-                    input, select, textarea { background-color: #ffffff !important; color: #0f172a !important; border-color: #cbd5e1 !important; }
-                `;
-            } else if (nomeTema === 'cinza') {
-                return `
-                    body { background-color: #1a202c !important; color: #f1f5f9 !important; }
-                    #app-sidebar-container { background-color: #232a37 !important; border-color: #334155 !important; }
-                    .bg-cardbg { background-color: #232a37 !important; border-color: #334155 !important; box-shadow: 0 2px 4px rgba(0,0,0,0.1) !important; }
-                    .bg-darkbg { background-color: #1a202c !important; border-color: #475569 !important; color: #f1f5f9 !important; }
-                    .text-white { color: #ffffff !important; }
-                    .text-gray-400 { color: #94a3b8 !important; }
-                    .text-gray-300 { color: #cbd5e1 !important; }
-                    input, select, textarea { background-color: #1a202c !important; color: #ffffff !important; border-color: #475569 !important; }
-                `;
-            } else if (nomeTema === 'laranja') {
-                return `
-                    body { background-color: #fff7ed !important; color: #431407 !important; }
-                    #app-sidebar-container { background-color: #ffffff !important; border-color: #fed7aa !important; }
-                    .bg-cardbg { background-color: #ffffff !important; border-color: #fed7aa !important; box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.04) !important; }
-                    .bg-darkbg { background-color: #ffedd5 !important; border-color: #fdba74 !important; color: #431407 !important; }
-                    .text-white { color: #431407 !important; }
-                    .text-gray-400 { color: #ea580c !important; }
-                    .text-gray-300 { color: #9a3412 !important; }
-                    input, select, textarea { background-color: #ffffff !important; color: #431407 !important; border-color: #fed7aa !important; }
-                `;
-            } else {
-                return ''; 
-            }
-        }
-
-        function carregarTemaSalvo() {
-            const temaSalvo = localStorage.getItem('theme_preference') || 'escuro';
-            const styleTag = document.getElementById('theme-override');
-            if (styleTag) {
-                styleTag.innerHTML = obterCSSDoTema(temaSalvo);
-            }
-        }
-        carregarTemaSalvo();
-    </script>
-
     <!-- SCRIPT DA PÁGINA -->
-    <script type="module">
-        import { carregarMenuLateral } from './menu.js';
-        import { auth } from './firebase-config.js';
-        import { signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+<script type="module">
+    import { carregarMenuLateral } from './menu.js';
+    import { auth } from './firebase-config.js';
+    import { signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
-        // 1. CARREGA O MENU LATERAL INDEPENDENTE
-        carregarMenuLateral();
+    carregarMenuLateral();
 
-        // 2. RENDERIZA OS ÍCONES NATIVOS DA TELA
-        document.addEventListener('DOMContentLoaded', () => {
-            if (typeof lucide !== 'undefined') {
-                lucide.createIcons();
-            }
-        });
+    // CHECAR AUTENTICAÇÃO ANTES DE EXIBIR A PÁGINA
+    // (mesma lógica usada nos outros módulos do sistema)
+    onAuthStateChanged(auth, (user) => {
+        const loadingScreen = document.getElementById('screen-loading');
+        if (loadingScreen) loadingScreen.classList.add('hidden');
 
-        // CHECAR AUTENTICAÇÃO ANTES DE EXIBIR A PÁGINA
-        onAuthStateChanged(auth, (user) => {
-            const loadingScreen = document.getElementById('screen-loading');
-            if (loadingScreen) loadingScreen.classList.add('hidden');
+        if (user) {
+            document.getElementById('app-dashboard').classList.remove('hidden');
+            window.dispatchEvent(new Event('usuario-autenticado'));
+        } else {
+            window.location.href = 'index.html';
+        }
+    });
 
-            if (user) {
-                document.getElementById('app-dashboard').classList.remove('hidden');
-                window.dispatchEvent(new Event('usuario-autenticado'));
-            } else {
-                window.location.href = 'index.html';
-            }
-        });
+    document.body.addEventListener('click', (e) => {
+        const btnOut = e.target.closest('#btn-logout-global');
+        if (btnOut) {
+            signOut(auth).then(() => { window.location.href = 'index.html'; });
+        }
+    });
+</script>
 
-        document.body.addEventListener('click', (e) => {
-            const btnOut = e.target.closest('#btn-logout-global');
-            if (btnOut) {
-                signOut(auth).then(() => { window.location.href = 'index.html'; });
-            }
-        });
-    </script>
-
-    <!-- Script com as funções do cliente (salvar, listar, etc.) -->
     <script type="module" src="clientes.js"></script>
 </body>
 </html>
