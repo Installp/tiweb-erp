@@ -108,10 +108,10 @@
             <div id="painel-filtros" class="bg-cardbg border border-cardborder p-4 rounded-xl space-y-3 no-print">
                 <span class="text-xs font-semibold text-gray-400 uppercase tracking-wider">FILTRAR DADOS DO RELATÓRIO</span>
                 <div class="flex flex-wrap gap-2 items-center">
-                    <button type="button" onclick="filtrarPeriodo('mes_atual')" class="px-3 py-1.5 bg-gray-700 hover:bg-gray-600 text-xs text-white rounded-lg font-semibold transition-colors">Mês Atual</button>
-                    <button type="button" onclick="filtrarPeriodo('mes_anterior')" class="px-3 py-1.5 bg-gray-700 hover:bg-gray-600 text-xs text-white rounded-lg font-semibold transition-colors">Mês Anterior</button>
-                    <button type="button" onclick="filtrarPeriodo('ano')" class="px-3 py-1.5 bg-gray-700 hover:bg-gray-600 text-xs text-white rounded-lg font-semibold transition-colors">Ano Atual</button>
-                    <button type="button" onclick="filtrarPeriodo('tudo')" class="px-3 py-1.5 bg-gray-700 hover:bg-gray-600 text-xs text-white rounded-lg font-semibold transition-colors">Todo o Histórico</button>
+                    <button type="button" data-periodo="mes_atual" onclick="filtrarPeriodo('mes_atual')" class="btn-periodo px-3 py-1.5 text-xs rounded-lg font-semibold transition-colors border">Mês Atual</button>
+                    <button type="button" data-periodo="mes_anterior" onclick="filtrarPeriodo('mes_anterior')" class="btn-periodo px-3 py-1.5 text-xs rounded-lg font-semibold transition-colors border">Mês Anterior</button>
+                    <button type="button" data-periodo="ano" onclick="filtrarPeriodo('ano')" class="btn-periodo px-3 py-1.5 text-xs rounded-lg font-semibold transition-colors border">Ano Atual</button>
+                    <button type="button" data-periodo="tudo" onclick="filtrarPeriodo('tudo')" class="btn-periodo px-3 py-1.5 text-xs rounded-lg font-semibold transition-colors border">Todo o Histórico</button>
 
                     <div class="flex items-center gap-2 ml-auto mt-2 sm:mt-0">
                         <input type="date" id="filtro-inicio" onclick="try{this.showPicker()}catch(e){}" class="bg-darkbg border border-cardborder rounded-lg p-1.5 text-xs text-white focus:outline-none cursor-pointer">
@@ -131,7 +131,7 @@
                     </div>
                     <div class="bg-cardbg border border-cardborder p-4 rounded-xl flex flex-col justify-center">
                         <p class="text-xs font-semibold text-gray-400 uppercase">CUSTOS DIRETOS (OPERAÇÃO)</p>
-                        <h3 id="dre-custos" class="text-2xl font-bold text-orange-400 mt-1">R$ 0,00</h3>
+                        <h3 id="dre-custos" class="text-2xl font-bold text-red-400 mt-1">R$ 0,00</h3>
                     </div>
                     <div class="bg-cardbg border border-cardborder p-4 rounded-xl flex flex-col justify-center">
                         <p class="text-xs font-semibold text-gray-400 uppercase">DESPESAS GERAIS</p>
@@ -151,8 +151,8 @@
                             <span id="line-receita" class="font-mono font-bold text-emerald-400">R$ 0,00</span>
                         </div>
                         <div class="flex justify-between items-center py-2 border-b border-cardborder/50">
-                            <span class="font-bold text-orange-400">(-) CUSTOS DIRETOS DA OPERAÇÃO</span>
-                            <span id="line-custos-total" class="font-mono font-bold text-orange-400">R$ 0,00</span>
+                            <span class="font-bold text-red-400">(-) CUSTOS DIRETOS DA OPERAÇÃO</span>
+                            <span id="line-custos-total" class="font-mono font-bold text-red-400">R$ 0,00</span>
                         </div>
                         <div class="flex justify-between items-center py-3 bg-darkbg p-3 rounded-lg font-bold text-white my-2">
                             <span>(=) LUCRO BRUTO OPERACIONAL</span>

@@ -134,6 +134,15 @@
 
         // SISTEMA DE FILTROS
         window.filtrarPeriodo = function(tipo) {
+            // Realça visualmente o botão de período selecionado
+            // (mesmo padrão visual das abas de relatório acima)
+            document.querySelectorAll('.btn-periodo').forEach(btn => {
+                const ativo = btn.dataset.periodo === tipo;
+                btn.className = ativo
+                    ? 'btn-periodo px-3 py-1.5 text-xs rounded-lg font-semibold transition-colors border bg-blue-600/20 text-blue-400 border-blue-500/30'
+                    : 'btn-periodo px-3 py-1.5 text-xs rounded-lg font-semibold transition-colors border text-gray-400 hover:bg-darkbg hover:text-white border-transparent';
+            });
+
             const hoje = new Date();
             let inicio, fim;
 
