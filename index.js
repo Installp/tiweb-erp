@@ -161,7 +161,7 @@ function renderizarGraficos(statusCount, faturamentoMensal) {
                 labels: ['Em Aberto', 'Em Andamento', 'Concluído'],
                 datasets: [{
                     data: [statusCount['Em aberto'], statusCount['Em andamento'], statusCount['Concluído']],
-                    backgroundColor: ['#eab308', '#3b82f6', '#10b981'], 
+                    backgroundColor: ['#0567e793', '#b2b211', '#10b981'], 
                     borderWidth: 0,
                     hoverOffset: 4
                 }]
