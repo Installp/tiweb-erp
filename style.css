@@ -1,17 +1,6 @@
 /* =========================================
    STYLE.CSS - Estilos Globais do Sistema
-   =========================================
-
-   IMPORTANTE: a partir desta versão, a troca de tema (claro/cinza/
-   laranja) e feita dinamicamente por theme-loader.js, que injeta CSS
-   em <style id="theme-override"> -- inclusive os estados de :hover,
-   que antes ficavam sempre escuros independente do tema selecionado.
-
-   Este arquivo cuida apenas de:
-   1. Tema padrao (escuro), sempre visivel antes do JS carregar.
-   2. Polimento visual geral (transicoes, scrollbar, foco) que vale
-      para qualquer tema.
-*/
+   ========================================= */
 
 /* --- TEMA PADRAO (ESCURO) --- */
 body {
@@ -34,66 +23,56 @@ body {
     border-color: #30363d !important;
 }
 
-
 /* =========================================
    POLIMENTO VISUAL GERAL (todos os temas)
    ========================================= */
 
-/* Transicoes mais suaves e consistentes em toda a interface.
-   Cada elemento continua controlando O QUE anima via Tailwind
-   (transition-colors, transition-transform etc); aqui so deixamos
-   a curva de animacao mais agradavel/moderna. */
 * {
     transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* Realce sutil ao passar o mouse sobre botoes e cartoes clicaveis,
-   sem depender de cor (funciona em qualquer tema). */
+/* Realce sutil ao passar o mouse */
 button:not(:disabled),
 .bg-cardbg[onclick],
 [data-link] {
-    transition: transform 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease, border-color 0.15s ease;
-}
-button:not(:disabled):active {
-    transform: scale(0.98);
+    transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease, border-color 0.2s ease;
 }
 
-/* Foco acessivel e moderno (substitui o contorno duro padrao do
-   navegador por um anel suave, mantendo a navegacao por teclado). */
+button:not(:disabled):active {
+    transform: scale(0.97);
+}
+
+/* Foco acessivel e moderno */
 button:focus-visible,
 a:focus-visible,
 input:focus-visible,
 select:focus-visible,
 textarea:focus-visible {
     outline: none;
-    box-shadow: 0 0 0 2px #3b82f6 !important;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.5) !important;
 }
 
-/* Scrollbar customizada (Webkit: Chrome/Edge/Safari) -- mais fina e
-   discreta que a padrao do sistema operacional. */
+/* Scrollbar customizada moderna */
 ::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
+    width: 6px;
+    height: 6px;
 }
 ::-webkit-scrollbar-track {
     background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-    background-color: rgba(148, 163, 184, 0.35);
+    background-color: rgba(148, 163, 184, 0.2);
     border-radius: 999px;
 }
 ::-webkit-scrollbar-thumb:hover {
-    background-color: rgba(148, 163, 184, 0.55);
+    background-color: rgba(148, 163, 184, 0.4);
 }
 
-/* Firefox */
 * {
     scrollbar-width: thin;
-    scrollbar-color: rgba(148, 163, 184, 0.35) transparent;
+    scrollbar-color: rgba(148, 163, 184, 0.2) transparent;
 }
 
-/* Oculta elementos marcados como "somente para impressao normal"
-   quando a pagina esta em modo impressao (ex: botao Voltar, sidebar). */
 @media print {
     .no-print {
         display: none !important;

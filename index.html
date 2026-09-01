@@ -27,6 +27,9 @@
                         darkbg: '#0d1117',
                         cardbg: '#161b22',
                         cardborder: '#30363d'
+                    },
+                    boxShadow: {
+                        'soft': '0 4px 20px -2px rgba(0, 0, 0, 0.05)',
                     }
                 }
             }
@@ -36,10 +39,10 @@
     <!-- Tag para injeção de tema dinâmico via JS -->
     <style id="theme-override"></style>
     
-    <!-- Script que aplica o tema instantaneamente (fonte única em theme-loader.js) -->
+    <!-- Script que aplica o tema instantaneamente -->
     <script src="theme-loader.js"></script>
 </head>
-<body class="bg-darkbg text-gray-200 min-h-screen font-sans flex flex-col md:overflow-hidden transition-colors duration-200">
+<body class="bg-darkbg text-gray-200 min-h-screen font-sans flex flex-col md:overflow-hidden transition-colors duration-300">
 
     <!-- 0. TELA DE CARREGAMENTO -->
     <div id="screen-loading" class="flex-1 flex flex-col items-center justify-center min-h-screen z-50 absolute inset-0 bg-darkbg">
@@ -47,25 +50,25 @@
         <p class="text-sm text-gray-400">Verificando acesso...</p>
     </div>
 
-    <!-- 1. TELA DE LOGIN -->
+    <!-- 1. TELA DE LOGIN (Sem alterações estruturais, apenas bordas mais suaves) -->
     <div id="screen-login" class="hidden flex-1 flex items-center justify-center p-4 min-h-screen relative z-40 bg-darkbg">
-        <div class="bg-cardbg border border-cardborder p-8 rounded-xl shadow-2xl w-full max-w-md space-y-6">
+        <div class="bg-cardbg border border-cardborder/50 p-8 rounded-2xl shadow-soft w-full max-w-md space-y-6">
             <div class="flex flex-col items-center justify-center">
                 <img src="logo.png" alt="Logo" class="h-16 w-auto object-contain mb-3" onerror="this.src='https://via.placeholder.com/150?text=LOGO'">
-                <h2 class="text-2xl font-bold text-white">INSTALL PLACE</h2>
-                <p class="text-xs text-gray-400">Sistema de Gestão & Suporte TI</p>
+                <h2 class="text-2xl font-bold text-white tracking-tight">INSTALL PLACE</h2>
+                <p class="text-xs text-gray-400 mt-1">Sistema de Gestão & Suporte TI</p>
             </div>
             
-            <form id="login-form" class="space-y-4">
+            <form id="login-form" class="space-y-5 mt-4">
                 <div>
-                    <label class="block text-xs font-semibold text-gray-400 mb-1">E-MAIL</label>
-                    <input type="email" id="login-email" required placeholder="" class="w-full bg-darkbg border border-cardborder rounded-lg p-3 text-white focus:outline-none focus:border-blue-500 transition-colors">
+                    <label class="block text-xs font-semibold text-gray-400 mb-1.5 tracking-wide">E-MAIL</label>
+                    <input type="email" id="login-email" required class="w-full bg-darkbg border border-cardborder/50 rounded-xl p-3.5 text-white focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all">
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold text-gray-400 mb-1">SENHA</label>
-                    <input type="password" id="login-password" required placeholder="" class="w-full bg-darkbg border border-cardborder rounded-lg p-3 text-white focus:outline-none focus:border-blue-500 transition-colors">
+                    <label class="block text-xs font-semibold text-gray-400 mb-1.5 tracking-wide">SENHA</label>
+                    <input type="password" id="login-password" required class="w-full bg-darkbg border border-cardborder/50 rounded-xl p-3.5 text-white focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all">
                 </div>
-                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold p-3 rounded-lg transition-colors shadow-lg shadow-blue-600/30">
+                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-semibold py-3.5 rounded-xl transition-all shadow-lg shadow-blue-600/20 active:scale-[0.98]">
                     Acessar Painel
                 </button>
                 <p id="login-error" class="text-red-400 text-xs text-center hidden">Usuário ou senha inválidos.</p>
@@ -76,119 +79,117 @@
     <!-- 2. PAINEL PRINCIPAL / DASHBOARD -->
     <div id="app-dashboard" class="hidden flex-1 flex flex-col md:flex-row min-h-screen md:h-screen md:overflow-hidden">
         
-        <!-- ========================================== -->
-        <!-- MENU LATERAL INDEPENDENTE INJETADO AQUI    -->
-        <!-- ========================================== -->
-        <aside id="app-sidebar-container" class="w-full md:w-64 bg-cardbg border-b md:border-b-0 md:border-r border-cardborder p-4 flex flex-col justify-between md:h-screen md:sticky md:top-0 flex-shrink-0 overflow-y-auto no-print">
+        <!-- MENU LATERAL -->
+        <aside id="app-sidebar-container" class="w-full md:w-64 bg-cardbg border-b md:border-b-0 md:border-r border-cardborder/50 p-4 flex flex-col justify-between md:h-screen md:sticky md:top-0 flex-shrink-0 overflow-y-auto no-print">
         </aside>
 
         <!-- ÁREA DE CONTEÚDO DA DASHBOARD -->
-        <main class="flex-1 p-4 md:p-8 overflow-y-auto space-y-6 md:h-screen">
+        <main class="flex-1 p-4 md:p-8 overflow-y-auto space-y-8 md:h-screen">
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
-                    <h1 class="text-2xl font-bold text-white">Painel Principal</h1>
-                    <p class="text-xs text-gray-400">Visão geral das operações, gráficos e acessos rápidos aos módulos</p>
+                    <h1 class="text-3xl font-bold text-white tracking-tight">Painel Principal</h1>
+                    <p class="text-sm text-gray-400 mt-1">Visão geral das operações, gráficos e acessos rápidos</p>
                 </div>
             </div>
 
             <!-- CARDS DE RESUMO/MÉTRICAS -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                <div class="bg-cardbg border border-cardborder p-5 rounded-xl cursor-pointer hover:border-blue-500/50 transition-colors" data-link="OrdemdeServico.html">
-                    <div class="flex justify-between items-center mb-2 text-blue-400">
-                        <span class="text-xs font-semibold text-gray-400 uppercase">Ordens de Serviço</span>
-                        <i data-lucide="file-text"></i>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+                <div class="bg-cardbg border border-cardborder/50 p-6 rounded-2xl shadow-soft cursor-pointer hover:shadow-md hover:border-blue-500/40 transition-all group" data-link="OrdemdeServico.html">
+                    <div class="flex justify-between items-center mb-4 text-blue-400">
+                        <span class="text-[11px] font-bold text-gray-400 uppercase tracking-wider">Ordens de Serviço</span>
+                        <div class="p-2 bg-blue-500/10 rounded-lg group-hover:bg-blue-500/20 transition-colors"><i data-lucide="file-text" class="w-5 h-5"></i></div>
                     </div>
-                    <h3 id="dash-os-total" class="text-2xl font-bold text-white">0</h3>
-                    <p class="text-[11px] text-blue-400 mt-1">Gerenciar chamados/OS</p>
+                    <h3 id="dash-os-total" class="text-3xl font-bold text-white">0</h3>
+                    <p class="text-[12px] text-blue-400 mt-2 font-medium">Gerenciar chamados/OS</p>
                 </div>
 
-                <div class="bg-cardbg border border-cardborder p-5 rounded-xl cursor-pointer hover:border-emerald-500/50 transition-colors" data-link="Clientes.html">
-                    <div class="flex justify-between items-center mb-2 text-emerald-400">
-                        <span class="text-xs font-semibold text-gray-400 uppercase">Clientes Cadastrados</span>
-                        <i data-lucide="users"></i>
+                <div class="bg-cardbg border border-cardborder/50 p-6 rounded-2xl shadow-soft cursor-pointer hover:shadow-md hover:border-emerald-500/40 transition-all group" data-link="Clientes.html">
+                    <div class="flex justify-between items-center mb-4 text-emerald-400">
+                        <span class="text-[11px] font-bold text-gray-400 uppercase tracking-wider">Clientes Cadastrados</span>
+                        <div class="p-2 bg-emerald-500/10 rounded-lg group-hover:bg-emerald-500/20 transition-colors"><i data-lucide="users" class="w-5 h-5"></i></div>
                     </div>
-                    <h3 id="dash-cli-total" class="text-2xl font-bold text-white">0</h3>
-                    <p class="text-[11px] text-emerald-400 mt-1">Gerenciar clientes</p>
+                    <h3 id="dash-cli-total" class="text-3xl font-bold text-white">0</h3>
+                    <p class="text-[12px] text-emerald-400 mt-2 font-medium">Gerenciar clientes</p>
                 </div>
 
-                <div class="bg-cardbg border border-cardborder p-5 rounded-xl cursor-pointer hover:border-slate-400/50 transition-colors" data-link="Servicos.html">
-                    <div class="flex justify-between items-center mb-2 text-gray-400">
-                        <span class="text-xs font-semibold text-gray-400 uppercase">Serviços no Catálogo</span>
-                        <i data-lucide="wrench"></i>
+                <div class="bg-cardbg border border-cardborder/50 p-6 rounded-2xl shadow-soft cursor-pointer hover:shadow-md hover:border-slate-400/40 transition-all group" data-link="Servicos.html">
+                    <div class="flex justify-between items-center mb-4 text-gray-400">
+                        <span class="text-[11px] font-bold text-gray-400 uppercase tracking-wider">Serviços no Catálogo</span>
+                        <div class="p-2 bg-slate-500/10 rounded-lg group-hover:bg-slate-500/20 transition-colors"><i data-lucide="wrench" class="w-5 h-5"></i></div>
                     </div>
-                    <h3 id="dash-ser-total" class="text-2xl font-bold text-white">0</h3>
-                    <p class="text-[11px] text-gray-400 mt-1">Ver serviços e valores</p>
+                    <h3 id="dash-ser-total" class="text-3xl font-bold text-white">0</h3>
+                    <p class="text-[12px] text-gray-400 mt-2 font-medium">Ver serviços e valores</p>
                 </div>
 
-                <div class="bg-cardbg border border-cardborder p-5 rounded-xl cursor-pointer hover:border-blue-500/50 transition-colors" data-link="Relatorios.html">
-                    <div class="flex justify-between items-center mb-2 text-blue-400">
-                        <span class="text-xs font-semibold text-gray-400 uppercase">Relatórios & DRE</span>
-                        <i data-lucide="pie-chart"></i>
+                <div class="bg-cardbg border border-cardborder/50 p-6 rounded-2xl shadow-soft cursor-pointer hover:shadow-md hover:border-blue-500/40 transition-all group" data-link="Relatorios.html">
+                    <div class="flex justify-between items-center mb-4 text-blue-400">
+                        <span class="text-[11px] font-bold text-gray-400 uppercase tracking-wider">Relatórios & DRE</span>
+                        <div class="p-2 bg-blue-500/10 rounded-lg group-hover:bg-blue-500/20 transition-colors"><i data-lucide="pie-chart" class="w-5 h-5"></i></div>
                     </div>
-                    <h3 class="text-2xl font-bold text-white">Acessar</h3>
-                    <p class="text-[11px] text-blue-400 mt-1">Análise financeira completa</p>
+                    <h3 class="text-2xl font-bold text-white mt-1">Acessar</h3>
+                    <p class="text-[12px] text-blue-400 mt-2 font-medium">Análise financeira completa</p>
                 </div>
             </div>
 
             <!-- SEÇÃO DE GRÁFICOS -->
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 <!-- Gráfico Linha/Barra - Evolução do Faturamento -->
-                <div class="lg:col-span-2 bg-cardbg border border-cardborder rounded-xl p-5 space-y-4">
-                    <div class="flex items-center justify-between border-b border-cardborder pb-3">
+                <div class="lg:col-span-2 bg-cardbg border border-cardborder/50 rounded-2xl p-6 shadow-soft space-y-4">
+                    <div class="flex items-center justify-between border-b border-cardborder/50 pb-4">
                         <h2 class="text-base font-bold text-white flex items-center gap-2">
-                            <i data-lucide="trending-up" class="w-5 h-5 text-emerald-400"></i> Desempenho Operacional
+                            <i data-lucide="trending-up" class="w-5 h-5 text-blue-500"></i> Desempenho Operacional
                         </h2>
-                        <span class="text-xs text-gray-400">Últimos 6 meses</span>
+                        <span class="text-xs text-gray-400 bg-darkbg px-3 py-1 rounded-full border border-cardborder/50">Últimos 6 meses</span>
                     </div>
-                    <div class="relative h-64 w-full">
+                    <div class="relative h-72 w-full pt-2">
                         <canvas id="chartEvolucao"></canvas>
                     </div>
                 </div>
 
                 <!-- Gráfico Rosca/Doughnut - Status das OS -->
-                <div class="bg-cardbg border border-cardborder rounded-xl p-5 space-y-4">
-                    <div class="flex items-center justify-between border-b border-cardborder pb-3">
+                <div class="bg-cardbg border border-cardborder/50 rounded-2xl p-6 shadow-soft space-y-4">
+                    <div class="flex items-center justify-between border-b border-cardborder/50 pb-4">
                         <h2 class="text-base font-bold text-white flex items-center gap-2">
                             <i data-lucide="target" class="w-5 h-5 text-blue-400"></i> Status das OS
                         </h2>
                     </div>
-                    <div class="relative h-64 w-full flex items-center justify-center">
+                    <div class="relative h-72 w-full flex items-center justify-center pt-2">
                         <canvas id="chartStatus"></canvas>
                     </div>
                 </div>
             </div>
 
             <!-- ATALHOS RÁPIDOS -->
-            <div class="bg-cardbg border border-cardborder rounded-xl p-6 space-y-4">
-                <h2 class="text-lg font-bold text-white border-b border-cardborder pb-3">Atalhos Rápidos</h2>
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                    <button data-link="OrdemdeServico.html" class="flex items-center gap-4 p-4 bg-darkbg border border-cardborder hover:border-blue-500 rounded-lg text-left transition-colors group">
-                        <div class="p-3 bg-blue-500/10 text-blue-400 rounded-lg group-hover:scale-110 transition-transform">
+            <div class="bg-cardbg border border-cardborder/50 rounded-2xl p-7 shadow-soft space-y-5">
+                <h2 class="text-lg font-bold text-white border-b border-cardborder/50 pb-4">Atalhos Rápidos</h2>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                    <button data-link="OrdemdeServico.html" class="flex items-center gap-4 p-4 bg-darkbg border border-cardborder/50 hover:border-blue-500/50 hover:shadow-md rounded-xl text-left transition-all group">
+                        <div class="p-3 bg-blue-500/10 text-blue-400 rounded-xl group-hover:scale-110 transition-transform">
                             <i data-lucide="plus-circle"></i>
                         </div>
                         <div>
-                            <span class="font-bold text-white text-sm block">Nova Ordem de Serviço</span>
-                            <span class="text-xs text-gray-400">Criar orçamento ou OS</span>
+                            <span class="font-bold text-white text-sm block">Nova Ordem</span>
+                            <span class="text-[12px] text-gray-400">Criar orçamento ou OS</span>
                         </div>
                     </button>
 
-                    <button data-link="Clientes.html" class="flex items-center gap-4 p-4 bg-darkbg border border-cardborder hover:border-emerald-500 rounded-lg text-left transition-colors group">
-                        <div class="p-3 bg-emerald-500/10 text-emerald-400 rounded-lg group-hover:scale-110 transition-transform">
+                    <button data-link="Clientes.html" class="flex items-center gap-4 p-4 bg-darkbg border border-cardborder/50 hover:border-emerald-500/50 hover:shadow-md rounded-xl text-left transition-all group">
+                        <div class="p-3 bg-emerald-500/10 text-emerald-400 rounded-xl group-hover:scale-110 transition-transform">
                             <i data-lucide="user-plus"></i>
                         </div>
                         <div>
                             <span class="font-bold text-white text-sm block">Novo Cliente</span>
-                            <span class="text-xs text-gray-400">Cadastrar contatos</span>
+                            <span class="text-[12px] text-gray-400">Cadastrar contatos</span>
                         </div>
                     </button>
 
-                    <button data-link="Despesas.html" class="flex items-center gap-4 p-4 bg-darkbg border border-cardborder hover:border-red-500 rounded-lg text-left transition-colors group">
-                        <div class="p-3 bg-red-500/10 text-red-400 rounded-lg group-hover:scale-110 transition-transform">
+                    <button data-link="Despesas.html" class="flex items-center gap-4 p-4 bg-darkbg border border-cardborder/50 hover:border-red-500/50 hover:shadow-md rounded-xl text-left transition-all group">
+                        <div class="p-3 bg-red-500/10 text-red-400 rounded-xl group-hover:scale-110 transition-transform">
                             <i data-lucide="receipt"></i>
                         </div>
                         <div>
                             <span class="font-bold text-white text-sm block">Lançar Despesa</span>
-                            <span class="text-xs text-gray-400">Registrar saídas</span>
+                            <span class="text-[12px] text-gray-400">Registrar saídas</span>
                         </div>
                     </button>
                 </div>
@@ -200,12 +201,10 @@
     <script type="module">
         import { carregarMenuLateral } from './menu.js';
         
-        // Renderiza o menu assim que possível
         carregarMenuLateral();
 
-        // Ouve os cliques nativos e do dashboard (atalhos rápidos)
         document.addEventListener('DOMContentLoaded', () => {
-            lucide.createIcons(); // Renderiza os ícones do Dashboard principal
+            lucide.createIcons();
         });
     </script>
     

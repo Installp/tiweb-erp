@@ -40,13 +40,11 @@ if (loginForm) {
 // ----------------------------------------------------
 // 2. SISTEMA DE LOGOUT (Com Delegação de Evento)
 // ----------------------------------------------------
-// Como o menu lateral é injetado via JavaScript (menu.js), o botão de logout 
-// pode não existir no instante 0. Ouvimos os cliques no body para capturá-lo.
 document.body.addEventListener('click', (e) => {
     const btnOut = e.target.closest('#btn-logout-global');
     if (btnOut) {
         signOut(auth).then(() => {
-            window.location.href = 'index.html'; // Força recarregar a tela inicial
+            window.location.href = 'index.html'; 
         });
     }
 });
@@ -60,7 +58,6 @@ document.querySelectorAll('[data-link]').forEach(button => {
         const paginaAtual = window.location.pathname.split('/').pop().toLowerCase();
         const paginaAlvo = pagina.toLowerCase();
 
-        // Se já estiver na página, apenas rola para o topo
         if (paginaAtual === paginaAlvo || (paginaAtual === '' && paginaAlvo === 'index.html')) {
             const mainContent = document.querySelector('main');
             if (mainContent) mainContent.scrollTo({ top: 0, behavior: 'smooth' });
@@ -80,7 +77,6 @@ onAuthStateChanged(auth, async (user) => {
         if (screenLogin) screenLogin.classList.add('hidden');
         if (appDashboard) appDashboard.classList.remove('hidden');
         
-        // Dispara o carregamento dos dados e geração dos gráficos
         await carregarMetricasDashboard();
     } else {
         if (screenLogin) screenLogin.classList.remove('hidden');
@@ -93,14 +89,12 @@ onAuthStateChanged(auth, async (user) => {
 // ----------------------------------------------------
 async function carregarMetricasDashboard() {
     try {
-        // Busca coleções do Firebase simultaneamente para ser mais rápido
         const [snapOS, snapC, snapS] = await Promise.all([
             getDocs(collection(db, "orcamentos")),
             getDocs(collection(db, "clientes")),
             getDocs(collection(db, "servicos"))
         ]);
 
-        // Preenche os cards de totais
         const countOS = document.getElementById('dash-os-total');
         if (countOS) countOS.innerText = snapOS.size;
         
@@ -110,11 +104,8 @@ async function carregarMetricasDashboard() {
         const countSer = document.getElementById('dash-ser-total');
         if (countSer) countSer.innerText = snapS.size;
 
-        // Prepara os dados para o gráfico de Status
         let statusCount = { 'Em aberto': 0, 'Em andamento': 0, 'Concluído': 0 };
         
-        // Prepara os dados para o gráfico de Evolução (Linha)
-        // Pré-preenche os últimos 6 meses com R$ 0,00 para criar a "linha" inicial
         let faturamentoMensal = {};
         for (let i = 5; i >= 0; i--) {
             const d = new Date();
@@ -124,32 +115,27 @@ async function carregarMetricasDashboard() {
             faturamentoMensal[`${mes}/${ano}`] = 0;
         }
 
-        // Analisa cada Ordem de Serviço
         snapOS.forEach(doc => {
             const os = doc.data();
             
-            // 1. Conta os status da OS
             if (os.status === 'Em aberto') statusCount['Em aberto']++;
             else if (os.status === 'Em andamento') statusCount['Em andamento']++;
             else if (os.status === 'Concluído') statusCount['Concluído']++;
 
-            // 2. Agrupa faturamento por mês (MM/YYYY)
             if (os.data && os.total) {
                 const partesData = os.data.split('/');
                 if (partesData.length === 3) {
-                    const mesAno = `${partesData[1]}/${partesData[2]}`; // "MM/YYYY"
+                    const mesAno = `${partesData[1]}/${partesData[2]}`; 
                     
                     if (faturamentoMensal[mesAno] !== undefined) {
                         faturamentoMensal[mesAno] = arredondaMoeda(faturamentoMensal[mesAno] + Number(os.total));
                     } else {
-                        // Se for uma OS de um mês muito antigo, adiciona no gráfico também
                         faturamentoMensal[mesAno] = arredondaMoeda(Number(os.total));
                     }
                 }
             }
         });
 
-        // Chama a função que desenha os gráficos passando os dados coletados
         renderizarGraficos(statusCount, faturamentoMensal);
 
     } catch (err) {
@@ -158,24 +144,24 @@ async function carregarMetricasDashboard() {
 }
 
 // ----------------------------------------------------
-// 6. RENDERIZAR GRÁFICOS (Chart.js)
+// 6. RENDERIZAR GRÁFICOS (Chart.js Modernizado)
 // ----------------------------------------------------
 function renderizarGraficos(statusCount, faturamentoMensal) {
     
-    // Destroi os gráficos anteriores se existirem (evita erro de sobreposição ao redimensionar)
     if (chartEvolucaoInstance) chartEvolucaoInstance.destroy();
     if (chartStatusInstance) chartStatusInstance.destroy();
 
     // -- GRÁFICO 1: STATUS DAS OS (Doughnut) --
-    const ctxStatus = document.getElementById('chartStatus');
-    if (ctxStatus) {
+    const canvasStatus = document.getElementById('chartStatus');
+    if (canvasStatus) {
+        const ctxStatus = canvasStatus.getContext('2d');
         chartStatusInstance = new Chart(ctxStatus, {
             type: 'doughnut',
             data: {
                 labels: ['Em Aberto', 'Em Andamento', 'Concluído'],
                 datasets: [{
                     data: [statusCount['Em aberto'], statusCount['Em andamento'], statusCount['Concluído']],
-                    backgroundColor: ['#eab308', '#3b82f6', '#10b981'], // Amarelo, Azul, Verde
+                    backgroundColor: ['#eab308', '#3b82f6', '#10b981'], 
                     borderWidth: 0,
                     hoverOffset: 4
                 }]
@@ -183,25 +169,37 @@ function renderizarGraficos(statusCount, faturamentoMensal) {
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
+                cutout: '75%', // Deixa a argola mais fina e elegante
                 plugins: {
-                    legend: { position: 'bottom', labels: { color: '#94a3b8' } }
-                },
-                cutout: '70%' // Espessura da argola central
+                    legend: { 
+                        position: 'bottom', 
+                        labels: { 
+                            color: '#94a3b8',
+                            usePointStyle: true, // Substitui os quadrados por bolinhas na legenda
+                            padding: 20
+                        } 
+                    }
+                }
             }
         });
     }
 
     // -- GRÁFICO 2: EVOLUÇÃO DO FATURAMENTO (Line) --
-    const ctxEvolucao = document.getElementById('chartEvolucao');
-    if (ctxEvolucao) {
-        // Ordena cronologicamente os meses no eixo X
+    const canvasEvolucao = document.getElementById('chartEvolucao');
+    if (canvasEvolucao) {
+        const ctxEvolucao = canvasEvolucao.getContext('2d');
+        
+        // Criação do gradiente dinâmico sob a linha
+        let gradientBlue = ctxEvolucao.createLinearGradient(0, 0, 0, 300);
+        gradientBlue.addColorStop(0, 'rgba(59, 130, 246, 0.45)'); 
+        gradientBlue.addColorStop(1, 'rgba(59, 130, 246, 0.0)');
+
         const mesesLabels = Object.keys(faturamentoMensal).sort((a, b) => {
             const [mA, aA] = a.split('/');
             const [mB, aB] = b.split('/');
             return new Date(aA, mA - 1) - new Date(aB, mB - 1);
         });
         
-        // Mapeia os valores (R$) correspondentes a cada mês
         const valoresData = mesesLabels.map(mes => faturamentoMensal[mes]);
 
         chartEvolucaoInstance = new Chart(ctxEvolucao, {
@@ -212,14 +210,15 @@ function renderizarGraficos(statusCount, faturamentoMensal) {
                     label: 'Faturamento Bruto',
                     data: valoresData,
                     borderColor: '#3b82f6',
-                    backgroundColor: 'rgba(59, 130, 246, 0.2)',
-                    borderWidth: 2,
+                    backgroundColor: gradientBlue, // Aplica o gradiente
+                    borderWidth: 3, // Linha um pouco mais grossa para destacar
                     fill: true,
-                    tension: 0.4, // Suaviza a curva da linha
+                    tension: 0.4, // Mantém a suavização em onda
                     pointBackgroundColor: '#fff',
                     pointBorderColor: '#3b82f6',
                     pointBorderWidth: 2,
-                    pointRadius: 4
+                    pointRadius: 4,
+                    pointHoverRadius: 6
                 }]
             },
             options: {
@@ -228,9 +227,14 @@ function renderizarGraficos(statusCount, faturamentoMensal) {
                 plugins: {
                     legend: { display: false },
                     tooltip: {
+                        backgroundColor: 'rgba(22, 27, 34, 0.95)', // Fundo do tooltip combinando com o tema
+                        titleColor: '#e5e7eb',
+                        bodyColor: '#e5e7eb',
+                        borderColor: '#30363d',
+                        borderWidth: 1,
+                        padding: 12,
                         callbacks: {
                             label: function(context) {
-                                // Formata o valor dentro do balãozinho (Tooltip) para R$
                                 let label = context.dataset.label || '';
                                 if (label) label += ': ';
                                 if (context.parsed.y !== null) {
@@ -244,18 +248,26 @@ function renderizarGraficos(statusCount, faturamentoMensal) {
                 scales: {
                     y: {
                         beginAtZero: true,
-                        grid: { color: '#30363d' }, // Cor das linhas de fundo
+                        border: { display: false }, // Remove a linha dura do eixo Y
+                        grid: { 
+                            color: 'rgba(255, 255, 255, 0.04)', // Grade muito mais suave e discreta
+                            drawTicks: false
+                        }, 
                         ticks: { 
                             color: '#94a3b8',
+                            padding: 10,
                             callback: function(value) {
-                                // Deixa o eixo Y com a sigla R$
                                 return 'R$ ' + value;
                             }
                         }
                     },
                     x: {
-                        grid: { display: false }, // Remove as linhas verticais para ficar mais "clean"
-                        ticks: { color: '#94a3b8' }
+                        border: { display: false }, // Remove a linha dura do eixo X
+                        grid: { display: false }, // Sem grades verticais
+                        ticks: { 
+                            color: '#94a3b8',
+                            padding: 10
+                        }
                     }
                 }
             }
