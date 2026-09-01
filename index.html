@@ -36,49 +36,8 @@
     <!-- Tag para injeção de tema dinâmico via JS -->
     <style id="theme-override"></style>
     
-    <!-- Script que aplica o tema instantaneamente -->
-    <script>
-        (function carregarTemaGlobal() {
-            const tema = localStorage.getItem('theme_preference') || 'escuro';
-            const styleTag = document.getElementById('theme-override');
-            if (!styleTag) return;
-
-            if (tema === 'claro') {
-                styleTag.innerHTML = `
-                    body { background-color: #f4f5f7 !important; color: #0f172a !important; }
-                    #app-sidebar { background-color: #ffffff !important; border-color: #e5e7eb !important; }
-                    .bg-cardbg { background-color: #ffffff !important; border-color: #e5e7eb !important; box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.04) !important; }
-                    .bg-darkbg { background-color: #f8fafc !important; border-color: #cbd5e1 !important; color: #0f172a !important; }
-                    .text-white { color: #0f172a !important; }
-                    .text-gray-400 { color: #64748b !important; }
-                    .text-gray-300 { color: #334155 !important; }
-                    input, select, textarea { background-color: #ffffff !important; color: #0f172a !important; border-color: #cbd5e1 !important; }
-                `;
-            } else if (tema === 'cinza') {
-                styleTag.innerHTML = `
-                    body { background-color: #1a202c !important; color: #f1f5f9 !important; }
-                    #app-sidebar { background-color: #232a37 !important; border-color: #334155 !important; }
-                    .bg-cardbg { background-color: #232a37 !important; border-color: #334155 !important; box-shadow: 0 2px 4px rgba(0,0,0,0.1) !important; }
-                    .bg-darkbg { background-color: #1a202c !important; border-color: #475569 !important; color: #f1f5f9 !important; }
-                    .text-white { color: #ffffff !important; }
-                    .text-gray-400 { color: #94a3b8 !important; }
-                    .text-gray-300 { color: #cbd5e1 !important; }
-                    input, select, textarea { background-color: #1a202c !important; color: #ffffff !important; border-color: #475569 !important; }
-                `;
-            } else if (tema === 'laranja') {
-                styleTag.innerHTML = `
-                    body { background-color: #fff7ed !important; color: #431407 !important; }
-                    #app-sidebar { background-color: #ffffff !important; border-color: #fed7aa !important; }
-                    .bg-cardbg { background-color: #ffffff !important; border-color: #fed7aa !important; box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.04) !important; }
-                    .bg-darkbg { background-color: #ffedd5 !important; border-color: #fdba74 !important; color: #431407 !important; }
-                    .text-white { color: #431407 !important; }
-                    .text-gray-400 { color: #ea580c !important; }
-                    .text-gray-300 { color: #9a3412 !important; }
-                    input, select, textarea { background-color: #ffffff !important; color: #431407 !important; border-color: #fed7aa !important; }
-                `;
-            }
-        })();
-    </script>
+    <!-- Script que aplica o tema instantaneamente (fonte única em theme-loader.js) -->
+    <script src="theme-loader.js"></script>
 </head>
 <body class="bg-darkbg text-gray-200 min-h-screen font-sans flex flex-col md:overflow-hidden transition-colors duration-200">
 
