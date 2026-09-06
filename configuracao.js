@@ -110,7 +110,23 @@
         }
 
         // FUNÇÃO DE ATUALIZAÇÃO (SISTEMA DE VERSION.JSON)
-        const VERSAO_ATUAL = "1.3.0";
+        //
+        // Antes, a versão "instalada" ficava fixa no código (VERSAO_ATUAL).
+        // Isso quebrava a função: mesmo depois de o usuário confirmar a
+        // atualização, o valor no código nunca mudava sozinho, então o
+        // sistema voltava a acusar "nova versão disponível" pra sempre,
+        // mesmo já estando atualizado — a função nunca "terminava".
+        //
+        // Agora a versão instalada fica salva no localStorage do próprio
+        // navegador, e é atualizada de verdade assim que o usuário
+        // confirma a atualização.
+        function obterVersaoInstalada() {
+            return localStorage.getItem('versao_instalada');
+        }
+
+        function salvarVersaoInstalada(versao) {
+            localStorage.setItem('versao_instalada', versao);
+        }
 
         window.verificarAtualizacao = async function(event) {
             const btn = event?.currentTarget;
@@ -124,8 +140,18 @@
                 if (!resposta.ok) throw new Error("Falha na busca.");
 
                 const dados = await resposta.json();
+                const versaoInstalada = obterVersaoInstalada();
 
-                if (dados.versao !== VERSAO_ATUAL) {
+                // Primeira vez que roda nesse navegador: assume que a
+                // versão atualmente publicada é a que já está em uso,
+                // em vez de acusar "atualização" sem necessidade.
+                if (!versaoInstalada) {
+                    salvarVersaoInstalada(dados.versao);
+                    mostrarToast(`✅ Você está utilizando a versão mais recente (${dados.versao})!`, 'sucesso');
+                    return;
+                }
+
+                if (dados.versao !== versaoInstalada) {
                     let listaNovidades = dados.novidades.map(item => `• ${item}`).join('\n');
                     let mensagem = `🚀 Nova Versão: v${dados.versao} (${dados.data})\n\nNovidades:\n${listaNovidades}\n\nDeseja atualizar agora?`;
 
@@ -134,10 +160,13 @@
                             const cacheNames = await caches.keys();
                             await Promise.all(cacheNames.map(name => caches.delete(name)));
                         }
-                        window.location.reload(true);
+                        // Marca a nova versão como instalada ANTES de recarregar,
+                        // para que a próxima checagem já reconheça que está em dia.
+                        salvarVersaoInstalada(dados.versao);
+                        window.location.reload();
                     }
                 } else {
-                    mostrarToast(`✅ Você já está utilizando a versão mais recente (${VERSAO_ATUAL})!`, 'sucesso');
+                    mostrarToast(`✅ Você já está utilizando a versão mais recente (${versaoInstalada})!`, 'sucesso');
                 }
             } catch (erro) {
                 console.error("Erro verificação:", erro);

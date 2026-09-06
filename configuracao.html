@@ -62,31 +62,27 @@
                     <p class="text-xs text-gray-400">Clique em uma das opções abaixo para alterar o tema em todo o ERP:</p>
                 </div>
 
-                <!-- LINHA DE CÍRCULOS COMPACTOS -->
-                <div class="flex flex-wrap items-center gap-8 pt-2">
-                    <!-- 1. Escuro Tech -->
-                    <div onclick="aplicarTema('escuro')" id="theme-btn-escuro" class="theme-circle-btn flex flex-col items-center gap-2 cursor-pointer group">
-                        <div class="w-10 h-10 rounded-full bg-[#0d1117] border-2 border-blue-500 shadow-md transition-all group-hover:scale-110"></div>
-                        <span class="text-xs font-semibold text-gray-300 group-hover:text-white transition-colors">Escuro</span>
-                    </div>
+                <!-- OPÇÕES DE TEMA (MINIMALISTA) -->
+                <div class="flex flex-wrap items-center gap-3 pt-2">
+                    <button onclick="aplicarTema('escuro')" id="theme-btn-escuro" class="theme-swatch-btn flex items-center gap-2.5 px-3 py-2 rounded-lg border transition-colors">
+                        <span class="w-5 h-5 rounded-md border border-cardborder flex-shrink-0" style="background-color:#0d1117"></span>
+                        <span class="text-xs font-semibold">Escuro</span>
+                    </button>
 
-                    <!-- 2. Cinza Soft -->
-                    <div onclick="aplicarTema('cinza')" id="theme-btn-cinza" class="theme-circle-btn flex flex-col items-center gap-2 cursor-pointer group">
-                        <div class="w-10 h-10 rounded-full bg-[#272d37] border-2 border-slate-400 shadow-md transition-all group-hover:scale-110"></div>
-                        <span class="text-xs font-semibold text-gray-300 group-hover:text-white transition-colors">Cinza</span>
-                    </div>
+                    <button onclick="aplicarTema('cinza')" id="theme-btn-cinza" class="theme-swatch-btn flex items-center gap-2.5 px-3 py-2 rounded-lg border transition-colors">
+                        <span class="w-5 h-5 rounded-md border border-cardborder flex-shrink-0" style="background-color:#272d37"></span>
+                        <span class="text-xs font-semibold">Cinza</span>
+                    </button>
 
-                    <!-- 3. Laranja Suave -->
-                    <div onclick="aplicarTema('laranja')" id="theme-btn-laranja" class="theme-circle-btn flex flex-col items-center gap-2 cursor-pointer group">
-                        <div class="w-10 h-10 rounded-full bg-[#fff7ed] border-2 border-orange-500 shadow-md transition-all group-hover:scale-110"></div>
-                        <span class="text-xs font-semibold text-gray-300 group-hover:text-white transition-colors">Laranja Suave</span>
-                    </div>
+                    <button onclick="aplicarTema('laranja')" id="theme-btn-laranja" class="theme-swatch-btn flex items-center gap-2.5 px-3 py-2 rounded-lg border transition-colors">
+                        <span class="w-5 h-5 rounded-md border border-cardborder flex-shrink-0" style="background-color:#fff7ed"></span>
+                        <span class="text-xs font-semibold">Laranja Suave</span>
+                    </button>
 
-                    <!-- 4. Clean Enterprise -->
-                    <div onclick="aplicarTema('claro')" id="theme-btn-claro" class="theme-circle-btn flex flex-col items-center gap-2 cursor-pointer group">
-                        <div class="w-10 h-10 rounded-full bg-[#f4f5f7] border-2 border-blue-600 shadow-md transition-all group-hover:scale-110"></div>
-                        <span class="text-xs font-semibold text-gray-300 group-hover:text-white transition-colors">Clean</span>
-                    </div>
+                    <button onclick="aplicarTema('claro')" id="theme-btn-claro" class="theme-swatch-btn flex items-center gap-2.5 px-3 py-2 rounded-lg border transition-colors">
+                        <span class="w-5 h-5 rounded-md border border-cardborder flex-shrink-0" style="background-color:#f4f5f7"></span>
+                        <span class="text-xs font-semibold">Clean</span>
+                    </button>
                 </div>
             </div>
 
@@ -215,21 +211,18 @@
                 styleTag.innerHTML = window.obterCSSDoTema(nomeTema);
             }
 
-            document.querySelectorAll('.theme-circle-btn div').forEach(circle => {
-                circle.classList.remove('ring-4', 'ring-blue-500', 'ring-orange-500', 'ring-slate-400', 'scale-110');
+            // Destaque minimalista: o tema ativo fica com fundo/borda sutil
+            // em azul; os demais ficam neutros. Mesmo padrão usado nos
+            // filtros de período do relatório.
+            document.querySelectorAll('.theme-swatch-btn').forEach(btn => {
+                const ativo = btn.id === `theme-btn-${nomeTema}`;
+                btn.className = ativo
+                    ? 'theme-swatch-btn flex items-center gap-2.5 px-3 py-2 rounded-lg border transition-colors bg-blue-600/10 border-blue-500/50 text-white'
+                    : 'theme-swatch-btn flex items-center gap-2.5 px-3 py-2 rounded-lg border transition-colors border-cardborder text-gray-400 hover:bg-darkbg hover:text-white';
             });
-
-            const btnAtivo = document.getElementById(`theme-btn-${nomeTema}`);
-            if (btnAtivo) {
-                const circle = btnAtivo.querySelector('div');
-                if (circle) {
-                    const ringColor = nomeTema === 'cinza' ? 'ring-slate-400' : (nomeTema === 'laranja' ? 'ring-orange-500' : 'ring-blue-500');
-                    circle.classList.add('ring-4', ringColor, 'scale-110');
-                }
-            }
         }
 
-        // Aplica o destaque visual (anel) no círculo do tema já ativo ao abrir a página
+        // Aplica o destaque visual no tema já ativo ao abrir a página
         aplicarTema(localStorage.getItem('theme_preference') || 'escuro');
     </script>
 

@@ -46,9 +46,9 @@ export function carregarMenuLateral() {
                         TiWEB
                     </span>
                     <div class="flex items-center gap-1.5 mt-1">
-                        <!-- Badge da versão -->
-                        <span class="px-1.5 py-0.5 rounded-md bg-blue-500/10 border border-blue-500/20 text-[10px] font-mono font-semibold text-blue-400">
-                            v1.3.0
+                        <!-- Badge da versão (atualizado dinamicamente via version.json) -->
+                        <span id="sidebar-versao-badge" class="px-1.5 py-0.5 rounded-md bg-blue-500/10 border border-blue-500/20 text-[10px] font-mono font-semibold text-blue-400">
+                            v...
                         </span>
                         <!-- Indicador de Status -->
                         <span class="flex items-center gap-1 text-[9px] text-gray-400 font-medium uppercase tracking-wider">
@@ -81,5 +81,20 @@ export function carregarMenuLateral() {
         if (typeof lucide !== 'undefined') {
             lucide.createIcons();
         }
+
+        // Busca a versão real publicada em version.json e atualiza o badge.
+        // Evita ter o número "preso" no código, esquecido depois de um deploy.
+        fetch(`version.json?v=${Date.now()}`)
+            .then(res => res.json())
+            .then(dados => {
+                const badge = document.getElementById('sidebar-versao-badge');
+                if (badge && dados.versao) {
+                    badge.innerText = `v${dados.versao}`;
+                }
+            })
+            .catch(() => {
+                // Sem internet ou falha na busca: mantém o placeholder "v..."
+                // em vez de arriscar mostrar um número desatualizado.
+            });
     }
 }
