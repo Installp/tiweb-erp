@@ -5,24 +5,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MÓDULO - Gestão de Clientes</title>
     
+    <!-- PWA: instalacao como app no Android -->
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#0d1117">
+    <meta name="mobile-web-app-capable" content="yes">
+    <link rel="icon" type="image/png" href="/icon-192.png">
+    <link rel="apple-touch-icon" href="/icon-192.png">
+    <script src="/pwa-register.js" defer></script>
+    
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
 
-    <!-- Configuração do Tailwind (cores customizadas usadas em todo o sistema) -->
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        darkbg: '#0d1117',
-                        cardbg: '#161b22',
-                        cardborder: '#30363d'
-                    }
-                }
-            }
-        }
-    </script>
+    <!-- Configuração de Cores e Tema do Tailwind (centralizado) -->
+    <script src="tailwind-theme.js"></script>
     
     <!-- Seu CSS Global Centralizado -->
     <link rel="stylesheet" href="style.css">
@@ -63,7 +58,7 @@
                     <h1 class="text-2xl font-bold text-white">Cadastro de Clientes</h1>
                     <p class="text-xs text-gray-400">Gerencie contatos, empresas e dados cadastrais</p>
                 </div>
-                <button id="btn-novo-cliente" class="bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-bold px-4 py-2.5 rounded-lg transition-colors shadow-lg shadow-emerald-600/20">
+                <button id="btn-novo-cliente" class="bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-bold px-4 py-2.5 rounded-lg transition-colors shadow-lg">
                     + Novo Cliente
                 </button>
             </div>

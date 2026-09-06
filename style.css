@@ -1,6 +1,19 @@
 /* =========================================
    STYLE.CSS - Estilos Globais do Sistema
-   ========================================= */
+   =========================================
+
+   Cores e fontes customizadas do Tailwind (darkbg, cardbg, cardborder,
+   primary, DM Sans) ficam centralizadas em tailwind-theme.js -- esse
+   arquivo aqui NAO redefine nenhuma delas, so importa a fonte e cuida
+   do polimento visual (transicoes, foco, scrollbar) e do tema padrao
+   antes do JS carregar.
+
+   A troca de tema (claro/cinza/laranja) e feita dinamicamente por
+   theme-loader.js, que injeta CSS em <style id="theme-override">
+   -- inclusive os estados de :hover.
+*/
+
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap');
 
 /* --- TEMA PADRAO (ESCURO) --- */
 body {
@@ -23,6 +36,7 @@ body {
     border-color: #30363d !important;
 }
 
+
 /* =========================================
    POLIMENTO VISUAL GERAL (todos os temas)
    ========================================= */
@@ -31,18 +45,18 @@ body {
     transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* Realce sutil ao passar o mouse */
+/* Realce sutil ao passar o mouse sobre botoes e cartoes clicaveis */
 button:not(:disabled),
 .bg-cardbg[onclick],
 [data-link] {
     transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease, border-color 0.2s ease;
 }
-
 button:not(:disabled):active {
     transform: scale(0.97);
 }
 
-/* Foco acessivel e moderno */
+/* Foco acessivel e moderno (substitui o contorno padrao do navegador
+   por um anel suave, mantendo a navegacao por teclado) */
 button:focus-visible,
 a:focus-visible,
 input:focus-visible,
@@ -52,7 +66,7 @@ textarea:focus-visible {
     box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.5) !important;
 }
 
-/* Scrollbar customizada moderna */
+/* Scrollbar customizada (Webkit: Chrome/Edge/Safari) */
 ::-webkit-scrollbar {
     width: 6px;
     height: 6px;
@@ -68,11 +82,13 @@ textarea:focus-visible {
     background-color: rgba(148, 163, 184, 0.4);
 }
 
+/* Firefox */
 * {
     scrollbar-width: thin;
     scrollbar-color: rgba(148, 163, 184, 0.2) transparent;
 }
 
+/* Oculta elementos "somente para impressao normal" em modo impressao */
 @media print {
     .no-print {
         display: none !important;
